@@ -18,23 +18,50 @@
 \begin{document}
 \frontmatter
 \maketitle
+\makestatement
 \tableofcontents
 \listoftables
 \listoffigures
 \mainmatter
+
 \chapter{Wprowadzenie}
-Dokument ten opisuje wykorzystanie klasy polsl-msth do przygotowania
-pracy magisterskiej na Wydziale Automatyki, Elektroniki i~Informatyki
-Politechniki Śląskiej. Sam dokument jest
-też zgodny z~szablonem pracy magisterskiej.
 
-W~rozdziale \ref{zalecenia} znajdują się zalecenia odnośnie formatowania
-pracy.
+Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii dla urządzeń przenośnych oraz pojazdów. W związku z tym od 20 lat można obserwować intensywne badania mające na celu poprawę parametrów ogniw i testowanie nowych technologii. Spadająca cena i poprawa właściwości powoduje wzrost zapotrzebowania, zwłaszcza za sprawą popularyzacji samochodów osobowych z napędem elektrycznym (EV). Branża automotive stawia bardzo wysokie wymagania dla akumulatorów samochodów EV: wymagana jest duża gęstość energetyczna, wysoka szybkość ładowania i ponadprzeciętna trwałość. Wciąż badane są nowe strategie ładowania które pozwalały by zachować wysokie parametry przy minimalizacji czasu ładowania.
 
-\chapter{Zalecenia\label{zalecenia}}
-Pierwszy akapit rozdziału, sekcji lub podsekcji powinien rozpoczynać
-się bez wcięcia. Wszystkie kolejne powinny mieć wcięcie skonfigurowane
-w~klasie.
+Niniejszy projekt inżynierski wpisuje się w ten trend, proponując ładowarkę pozwalającą z dużą elastycznością kształtować przebieg procesu ładowania. Docelowo urządzenie to ma umożliwiać przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z uwagi na dominującą pozycję na rynku ogniw w standardzie 18650, taki rozmiar został wybrany za docelowy. 
+
+
+\chapter{Teoria}
+\section{Budowa i specyfika działania ogniw litowo-jonowych}
+\section{Porównanie chemii}
+\section{Schematy ładowania}
+
+\chapter{Projekt urządzenia}
+\section{Założenia}
+Urządzenie ma być zdolne do ładowania ogniw litowo-jonowych o różnym składzie anody i katody w standardzie wymiarowym 18650 z ciągłym prądem maksymalnym 3A. Prąd ładowania ma być regulowany z dokładnością do 25mA. Urządzenie jest zasilane z zasilacza impulsowego o napięciu 5V i odpowiedniej mocy.
+\section{Identyfikacja kluczowych obszarów projektu}
+Aby można było realizować płynną regulację prądu wyjściowego można zastosować regulator liniowy lub przetwornice impulsowa o regulowanym napięciu wyjściowym. Ze względu na fakt, że urządzenie ma nadawać się do badań wpływu procesu ładowania na parametry ogniw, zdecydowano się na regulator liniowy, aby nie trzeba było badać stabilności napięcia ładowanie i wielkości niepożądanych szumów, mogących wpłynąć na jakość wyników prób. Wybrany sposób ograniczenia prądu ma taką zaletę, że tłumi zakłócenia pochodzące z zasilania.
+
+Wadą tego rozwiązania jest spora strata energii, a w konsekwencji znaczące wydzielanie się ciepła w układzie. Dla układu tworzonego w celach badawczych takie marnotrawstwo energii jest bez znaczenia, jednak temperatura komponentów ma duży wpływ na ich żywotność, a co za tym idzie powtarzalność procesu. Stąd istotne dla stabilnego działania układu jest zapewnienie skutecznego chłodzenia.
+
+Aby można było śledzić postęp ładowania i w prosty sposób zadawać parametry, przydatna jest komunikacja z komputerem. Wymagania co do kanału komunikacyjnego nie są wygórowane – ilość danych do przekazania jest niewielka, a okres przesyłania jest rzędu 1s.
+
+Kontroler układu musi odpowiadać także za kwestie bezpieczeństwa – minimalna funkcjonalność to ograniczenie lub odcięcie prądu w przypadku wzrostu temperatury ogniwa ponad ustaloną wartość.
+
+\section{Proponowane rozwiązania i wybór komponentów}
+\section{Projekt PCB}
+
+\chapter{Realizacja prototypu}
+\section{Kolejność działania i bieżąca modyfikacja projektu}
+\section{Stan finalny}
+\section{Implementacja potrzebnych funkcjonalności}
+
+\chapter{Testy i weryfikacja}
+
+
+
+
+\newpage
 
 Opis rysunków powinien znajdować się pod rysunkiem jak w~przypadku
 rysunku \ref{pi}.
