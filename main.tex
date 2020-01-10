@@ -4,6 +4,11 @@
 %% set document encoding
 \usepackage[utf8]{inputenc}
 
+%% other packages
+\usepackage{tikz}
+\usepackage{gensymb}
+\usepackage{pstricks}
+
 %% thesis author
 \author{Michał Dobrut}
 
@@ -49,9 +54,115 @@ Aby można było śledzić postęp ładowania i w prosty sposób zadawać parame
 Kontroler układu musi odpowiadać także za kwestie bezpieczeństwa – minimalna funkcjonalność to ograniczenie lub odcięcie prądu w przypadku wzrostu temperatury ogniwa ponad ustaloną wartość.
 
 \section{Proponowane rozwiązania i wybór komponentów}
-\section{Projekt PCB}
+Ze względu na wysoki założony prąd ładowania i niewielką różnicę napięcia pomiędzy maksymalnym napięciem na ogniwie (4.2V) a napięciem zasilania (5V) nie znaleziono żadnych gotowych rozwiązań zintegrowanych pozwalających na dostatecznie precyzyjną kontrolę prądu. W związku z tym wybrano rozwiązanie oparte o tranzystor MOS z kanałem typu P, sterowny przez wzmacniacz operacyjny w pętli sprzężenia zwrotnego.
 
+Podczas działania układu, w momencie gdy ogniwo jest rozładowany a napięcie na nim wynosi 3V, dla prądu maksymalnego moc wydzielana na tranzystorze wynosi $5.3\mathrm{W}$. Jest to stosunkowo dużo, zważywszy na małe rozmiary współczesnych tranzystorów spełniających wysokie wymagania dotyczące napięcie granicznego otwarcia. W tym celu użyto laminatu o ponadstandardowej grubości i pasywnych radiatorów wlutowanych bezpośrednio wokół tranzystora.
+
+Do sterowania całym układem wybrano 8-bitowy mikrokontroler firm Microchip: ATtiny414. Zawiera on wszystkie potrzebne peryferia od razu zintegrowane w jednym układzie, przy jednoczesnym zachowaniu niskiej ceny. 
+\section{Projekt struktury}
+Wybrana struktura układu regulacji prezentuje się jak na rys. \ref{dia:reg_all}. 
+\begin{figure}
+     \resizebox{\linewidth}{!}{\input{dia/control_flow.tex}}
+     \caption{Schemat blokowy układu regulacji\label{dia:reg_all}}
+\end{figure}
+
+Mikrokontroler (uC) mierzy za pomocą wewnętrznego przetwornika ADC napięcie na obu biegunach ogniwa, po czym odejmuje je od siebie aby uzyskać napięcie na samym ogniwie Ucell. Na podstawie wybranego przebiegu procesu ładowania, mikrokontroler wylicza prąd I który powinien być aktualnie podawany na baterię, i w zależności od trybu pracy zadaje go bezpośrednio lub przez regulator PI za pośrednictwem odpowiedniego napięcia Uset generowanego przez wewnętrzny DAC. Wzmacniacz operacyjny porównuje jego wartość z napięciem na rezystorze pomiarowym Rs i odpowiednio wysterowuje bramkę tranzystora. Fakt użycia tranzystora z kanałem typu P, otwieranego napięciem ujemnym jest uwzględniony w modelu przez ujemne wzmocnienie wzmacniacza $\mathrm{-k}$. Prąd płynący przez tranzystor powoduje powstawanie napięcia Ucell na ogniwie, które zależy także od temperatury ogniwa To, stopnia naładowania SOC a także zużycia ogniwa. Dodatkowo zaznaczono wpływ napięcia Ucell oraz temperatury tranzystora T jako zakłócenia, stwarzające wraz z mocno nieliniową charakterystyką MOSFETA konieczność wykorzystania wewnętrznej pętli sprzężenia zwrotnego.
+
+Realizacja 'części wykonawczej' tego układu jest przedstawiona na rys. \ref{img:charging_circuit}. 
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/CHARGING_LINE_SCHEMATIC.png}}
+     \caption{Schemat części wykonawczej ładowarki. \label{img:charging_circuit}}
+\end{figure}
+Aby zachować w maksymalnym stopniu użyteczną rozdzielczość DAC, konieczne było dopasowanie poziomów napięć dzielnikiem napięcia.
+
+\subsection{Element wykonawczy: tranzystor MOS typu P\label{section:mosfet} }
+Wymagania jakie stawia dla MOSFETa taka struktura układu są następujące:
+\begin{itemize}
+    \item napięcie graniczne $U_{GS(th)} < 2.5\mathrm{V}$, pozwalające na całkowite otwarcie tranzystora przy rozładowanym ogniwie.
+    \item niski opór otwarcia $R_{DS(on)}$, nie ograniczający prądu przy wystąpieniu dużej rezystancji wewnętrznej ogniwa.
+    \item mały opór termiczny złącze-obudowa $R_{thJC}$, pozwalający na rozproszenie ciepła podczas pracy w trybie liniowym
+\end{itemize}
+Aby wybrać najlepiej działający tranzystor, projekt PCB przygotowano tak, aby można było wlutować tranzystory w 3 różnych standardach obudowy. Porównanie parametrów wybranych elementów znajduje się w tablicy \ref{tab:mosfets}.
+
+\begin{table}[hbtp]
+\caption{Parametry wybranych tranzystorów.\label{tab:mosfets}}
+\centerline{\begin{tabular}{|c|c|c|c|c|}
+\hline
+nr. prod & $U_{GS(th)}$, mV & $R_{DS(on)}, \mathrm{m\Omega}$, & $R_{thJC}, \mathrm{\degree C/W}$ & obudowa \\
+\hline
+AON7407 & 550 & 18 & 3.5 & 8DFN 3x3 \\
+\hline
+AON7423 & 500 & 8.5 & 1.1 & 8DFN 3.3x3.3 \\ 
+\hline
+SIA427DJ-T1-GE3 & max 800 & 32 & 5.3 & PPak SC-70-6 \\
+\hline
+SI7615CDN-T1-GE3 & max 1000 & 20.3 & 2.9 & PPak 1212-8 \\
+\hline
+\end{tabular}}
+\end{table}
+Jak widać, AON7423 jest pod każdym względem lepszy i zostanie wybrany jako docelowy jeżeli nie wystąpią żadne nieprzewidziane czynniki.
+\subsection{Regulator tranzystora: wzmacniacz operacyjny}
+Ze względu na wybór tranzystora MOS, aby umożliwić kontrolę prądu prostymi algorytmami regulacji konieczne jest jego zlinearyzowanie. Zastosowanie pętli sprzężenia zwrotnego o dużym wzmocnieniu pozwoliło na zadawanie prąd za pomocą napięcia generowanego przez DAC mikrokontrolera, które to jest porównywane z napięciem na rezystorze pomiarowym. Dodatkowo takie rozwiązanie zapewniło eliminację wpływu temperatury tranzystora (która ulega znacznym wahaniom) oraz napięcia dren-źródło $U_{DS}$ (zależnego od stanu naładowania ogniwa) prąd wyjściowy. Taka konfiguracja ma jednak wadę: sprzężenie reaguje na prąd płynący przez rezystor $\mathrm{R_s}$, stąd przy małych wartościach tego prądu mogą wystąpić problemy z domknięciem tranzystora – pewien niewielki prąd będzie cały czas doładowywał ogniwo, ale gdy zostanie on utrzymany na niskim poziomie, nie będzie miało to większego wpływu na działanie układu.
+
+Aby zapewnić możliwość całkowitego otwarcia lub zamknięcie tranzystora, konieczne jest użycie wzmacniacza typu rail-to-rail na wyjściu. Dodatkowo, ze względu na wydzielane w układzie ciepło, wybrano wzmacniacz o bardzo niskim współczynniku cieplnym wejściowego napięcia niezrównoważenia ('zero drift'). Ponieważ dokładność działania zależy od wejściowego napięcia niezrównoważenia, zwrócono uwagę także aby ten parametr był utrzymany na niskim poziomie ('zero offset').
+
+Wybrano wzmacniacz AD8551, który zapewnia 'input offset drift' nie większy niż $\mathrm{0.005 \mu V/\degree C}$ i bardzo niskie wejściowe napięcie niezrównoważenia $\mathrm{<1\mu V}$
+\subsection{Element pomiarowy}
+Do mierzenia prądu płynącego przez ogniwo zastosowano rezystor o oporze $\mathrm{80m\Omega}$. Maksymalny spadek napięcia na elemencie pomiarowym, zapewniający poprawne działanie układy i odpowiednią dokładność pomiaru bez zbędnej komplikacji struktury przewidziany był na 250mV. Zastosowany opornik w przewidzianym zakresie użytkowania daje napięcie maksymalne $\mathrm{U_{rs(max)}=0.08\Omega * 3A = 240mV}$. Wybór nieoptymalnej wartości jest spowodowany brakiem dostępności na rynku opornika o tej rezystancji i dokładności dokładności 1\%. Maksymalna moc wydzielana na oporniku wynosi $\mathrm{R_s*I_{cell(max)}^2 = 0.08*3^2 = 0.72W}$, co maksymalnej dopuszczonej przez producenta mocy 3W, konstrukcji opartej o pytkę ze specjalnego stopu, umieszczeniu w dużej odległości od źródeł ciepła i dobrym jego odprowadzaniu zapewnia minimalizację błędów wynikających ze zmian oporu wraz z temperaturą.
+\subsection{Sterownik, regulator, zadajnik: mikrokontroler}
+W rozważanym układzie przed mikrokontrolerem stawia się następujące zadania:
+\begin{itemize}
+    \item sterowanie następowaniem po sobie etapów procesu,
+    \item regulacja prądu dostarczanego do ogniwa,
+    \item zadawanie wartości tego prądu z użyciem przetwornika C/A,
+    \item pomiar napięcia na ogniwie,
+    \item zapewnienie bezpieczeństwa procesu,
+    \item obsługa przycisków i diód sygnalizacyjnych,
+    \item komunikacja z komputerem.
+\end{itemize}
+W tym celu wybrano jednostkę ATtiny414, której istotne dla projektu parametry wyszczególniono poniżej:
+\begin{itemize}
+    \item procesor: AVR RISC 8 bit, 20MHz, sprzętowe mnożenie,
+    \item pamięć: 4kB program, 256B SRAM,
+    \item DAC: 8 bit, wewnętrzne napięcie odniesienia,
+    \item ADC: 10 bit, akumulacja do 64 pomiarów, wewnętrzne napięcie odniesienia, 
+    \item nap. odniesienia: 4.3, 2.5, 1.5, 1.1, 0.55V,
+    \item sprzętowe wsparcie UART,
+    \item I/O: 12 programowalnych linii
+\end{itemize}
+
+\section{Projekt PCB}
+Projekt płytki drukowanej, przedstawiony na rys. \ref{img:pcb_colored} został wykonany w darmowym środowisku KiCad. Wykonanie projektu przewidziano na laminacie dwustronnym o grubości miedzi 70um.
+
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/plytka_kolorowa.png}}
+     \caption{Schemat części wykonawczej ładowarki. \label{img:pcb_colored}}
+\end{figure}
+
+Aby zapewnić odporność na zakłócenia, na ile to możliwe zachowano ciągłość masy GND na spodniej powierzchni płytki. W tym samym celu rozlano +5V na górnej powierzchni. 
+
+Aby umożliwić przetestowanie kilku tranzystorów jak zaznaczono w punkcie \ref{section:mosfet}, przewidziane są pola na 3 różne standardy wyprowadzeń. Wokół niech znajdują się otwory, w których przewidziany jest montaż odcinków drutu 0.75mm$^2$, pełniących rolę radiatora.
+
+Rezystor pomiarowy znajduje się między ujemnym biegunem ogniwa i masą, maksymalnie oddalony od źródła ciepła jakim jest tranzystor. 
+
+Sygnał z biegów jest sprowadzony do mikrokontrolera, alby mógł mierzyć napięcie na ogniwie, a napięcie na rezystorze pomiarowym względem wspólnej masy doprowadzone jest również do wzmacniacza operacyjnego. Aby zabezpieczyć się przed zakłóceniami pochodzącymi od układu próbkującego przetwornika A/C, sygnał z ujemnego bieguna jest doprowadzony do mikrokontrolera przez rezystor 1k i buforowany na miejscu kondensatorem 100nF. Kondensator znajduje się również przy doprowadzeniu sygnału z bieguna dodatniego, aby ograniczyć ewentualny wpływ impedancji linii.
+
+Założono, że napięcie na rezystorze pomiarowym będzie nie większe niż 250mV, zatem sygnał do z przetwornika C/A musi zawierać się w tym samym przedziale. Aby w pełni wykorzystać rozdzielczość przetwornika, wybrano wewnętrzne napięcie odniesienia 2.5V, stąd najwyższe napięcie wyjściowe wyniesie 2.49V. Aby dopasować je do napięć na elemencie pomiarowym, wykorzystano dzielnik napięcia złożony z rezystorów 10k i 91k. Napięcie maksymalne na wejściu wzmacniacza jest równe $2.49*10/(10+91) = 0.247$V, czyli nieznacznie więcej niż przewidziane maksymalnie 0.24V na rezystorze. Takie dopasowanie poziomów jest zadowalające.
 \chapter{Realizacja prototypu}
+Płytka drukowana została wykonana metodą termotransferu. Z powodu braki soldermaski projekt realizowany jest etapami, aby zweryfikować poprawność montażu. Kolejność działań jest następująca:
+\begin{enumerate}
+    \item Weryfikacja i ewentualna naprawa ścieżek.
+    \item Montaż mikrokontrolera wraz z koniecznymi elementami pasywnymi i sprawdzenie działania linii programowania.
+    \item Montaż elementów pasywnych, diód sygnalizacyjnych i przycisków.
+    \item Weryfikacja działania linii komunikacyjnych.
+    \item Weryfikacja działaniu pomiaru napięcia ogniwa oraz przetwornika C/A.
+    \item Montaż i sprawdzenie działania wzmacniacza.
+    \item Montaż i sprawdzenie działania tranzystora.
+    \item Budowa obciążenia testowego i pierwsze testy działania z docelowym rezystorem.
+    \item Kalibracja przetwornika A/C.
+    \item Montaż uchwytu ogniwa i testy na ogniwie.
+    
+\end{enumerate}
 \section{Kolejność działania i bieżąca modyfikacja projektu}
 \section{Stan finalny}
 \section{Implementacja potrzebnych funkcjonalności}
@@ -63,25 +174,6 @@ Kontroler układu musi odpowiadać także za kwestie bezpieczeństwa – minimal
 
 \newpage
 
-Opis rysunków powinien znajdować się pod rysunkiem jak w~przypadku
-rysunku \ref{pi}.
-\begin{figure}[hbtp]
-\centerline{\includegraphics[width=1in]{pi}}
-\caption{Logo Politechniki Śląskiej.\label{pi}}
-\end{figure}
-
-Opis tabel powinien znajdować się nad tabelą jak w~przypadku
-tabeli \ref{tab}.
-\begin{table}[hbtp]
-\caption{Przykładowa tabela.\label{tab}}
-\centerline{\begin{tabular}{|c|c|}
-\hline
-1 & 2\\
-\hline
-3 & 4\\
-\hline
-\end{tabular}}
-\end{table}
 
 Równania powinny być numerowane jak równanie \ref{entropy}.
 \begin{equation}
