@@ -8,6 +8,7 @@
 \usepackage{tikz}
 \usepackage{gensymb}
 \usepackage{pstricks}
+\usepackage{hyperref}
 
 %% thesis author
 \author{Michał Dobrut}
@@ -35,15 +36,51 @@ Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii d
 
 Niniejszy projekt inżynierski wpisuje się w ten trend, proponując ładowarkę pozwalającą z dużą elastycznością kształtować przebieg procesu ładowania. Docelowo urządzenie to ma umożliwiać przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z uwagi na dominującą pozycję na rynku ogniw w standardzie 18650, taki rozmiar został wybrany za docelowy. 
 
-
 \chapter{Teoria}
 \section{Budowa i specyfika działania ogniw litowo-jonowych}
+Historia użytecznych ogniw na bazie litu sięga lat 70, kiedy Adam Heller opatentował pierwszą kompozycję chemiczną anody, katody i elektrolitu \cite{heller1975electrochemical}, pozwalającą na skonstruowanie baterii w cenach akceptowalnych przez rynek. Od tego czasu dostępnych jest wiele technologii wykonania takich ogniw, różniących się ze względu na wykorzystane materiały. Zasadę działania obecnie już wycofywanej technologii przedstawia rys. \ref{img:liion_structure}.
+\begin{figure}[hbtp]
+\centering
+     \resizebox{0.45\linewidth}{!}{\includegraphics[]{img/liion_structure.png}}
+     \caption{Budowa i działanie ogniwa z anodą grafitową i katodą LCO. \cite{liionpic_wikimedia}  \label{img:liion_structure}}
+\end{figure}
+Na tle innych technologii akumulatory litowo-jonowe przodują zarówno pod wpływem wagowej gęstości energetycznej jak i wagowej gęstości mocy. I główną wadą jest jednak trwałość w warunkach powtarzającego wykorzystywania pełnej pojemności. \cite{IBRAHIM20081221} Jest to powód, dla którego ogniwa te znalazły zastosowanie głównie w urządzeniach przenośnych i pojazdach oraz systemach awaryjnego zasilania, a w mniejszym stopniu do wyrównywania mocy dostarczanej do sieci elektrycznej.
+
 \section{Porównanie chemii}
+Obecnie dominującą rolę przejęły ogniwa oparte o katodę niklowo-manganowo-kobaltową NMC (w różnych proporcjach składników, dąży się do wyeliminowania lub zmniejszenia udziału drogiego kobaltu) oraz niklowo-kobaltowo-aluminiową NCA.\cite{bu_liiontypes} W zastosowaniach wymagających dużego bezpieczeństwa i długiej żywotności używa się także katod z fosforanu litowo-żelazowego LFP lub anod z tytanku litu LTO. Pozostałe technologie wychodzą z użytku, są bardzo drogie lub na razie mają wąski zakres zastosowań. W tabeli \ref{tab:chemisties_voltages} zebrano parametry interesujące ze względu na konstrukcję ładowarki.
+\begin{table}[hbtp]
+\caption{Wybrane parametry zależne od technologii ogniwa.\cite{bu_liiontypes} \label{tab:chemisties_voltages}}
+\centerline{\begin{tabular}{|c|c|c|c|c|}
+\hline
+Technologia & Napięcie maks., V & Napięcie min., V & Szybkość ład., C & Żywotność, cykle \\
+\hline
+LCO & 4.2 & 2.5 & 0.7-1 & 500-1000\\
+\hline
+LMO & 4.2 & 2.5 & 0.7-1 & 300-700\\
+\hline 
+NMC & 4.2 & 2.5 & 0.7-1 & 1000-2000\\ \hline
+LFP & 3.65 & 2.5 & 1 & 2000+\\ \hline
+NCA & 4.2 & 3.0 & 0.7 & 500\\ \hline
+LTO & 2.85 & 1.8 & 1C & 3000-7000\\ \hline
+\end{tabular}}
+\end{table}
+Ładowarka była projektowana dla najpopularniejszych ogniw na rynku, jednak dzięki odpowiednio dobranym komponentom jest w stanie działać także dla ogniw w technologii LTO, z ograniczeniem prądu ładowania.
+
 \section{Schematy ładowania}
+Ogniwa litowo jonowe, w większości przypadków optymalizowane aby osiągnąć maksymalną gęstość energetyczną, wykazują dużą wrażliwość na przekroczenie ograniczeń prądowych ładowania\cite{TOMASZEWSKA2019100011}, które w dobie rozwoju samochodów elektrycznych są czynnikiem mocno ograniczającym szeroką popularyzację. W związku z tym, badane są rozmaite schematy ładowania. Odpowiedni dobór profilu prądowego pozwala na podwojenie żywotności baterii w stosunku do ładowania profilem CC-CV, przy czasie ładowania dłuższym o około 15\%\cite{SCHINDLER2018364}.
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/protocols.jpg}}
+     \caption{Różne schematy ładowania, wykresy zaczerpnięte z \cite{TOMASZEWSKA2019100011}\label{img:charging_protocols}}
+\end{figure}
+
+Najbardziej rozpowszechnionym i rekomendowanym przez producentów schematem ładowania jest CC-CV, czyli utrzymywanie stałego prądu do momentu osiągnięcia zadanego napięcia maksymalnego, potem utrzymywanie tego napięcia, aż prąd spadnie poniżej zadanej wartości.
+
+Jeżeli zaimplementowane zostaną metody programowej kontroli tych parametrów, możliwe jest także wykorzystanie dowolnego innego protokołu, tak długo jak jego wymagania prądowe i napięciowe mogą być spełnione przez ładowarkę.
+
 
 \chapter{Projekt urządzenia}
 \section{Założenia}
-Urządzenie ma być zdolne do ładowania ogniw litowo-jonowych o różnym składzie anody i katody w standardzie wymiarowym 18650 z ciągłym prądem maksymalnym 3A. Prąd ładowania ma być regulowany z dokładnością do 25mA. Urządzenie jest zasilane z zasilacza impulsowego o napięciu 5V i odpowiedniej mocy.
+Urządzenie ma być zdolne do ładowania ogniw litowo-jonowych o różnym składzie anody i katody w standardzie wymiarowym 18650 z ciągłym prądem maksymalnym 3A. Prąd ładowania ma być regulowany z rozdzielczością powyżej 20mA, a napięcie utrzymywane z dokładnością do 20mV. Urządzenie jest zasilane z zasilacza impulsowego o napięciu 5V i odpowiedniej mocy.
 \section{Identyfikacja kluczowych obszarów projektu}
 Aby można było realizować płynną regulację prądu wyjściowego można zastosować regulator liniowy lub przetwornice impulsowa o regulowanym napięciu wyjściowym. Ze względu na fakt, że urządzenie ma nadawać się do badań wpływu procesu ładowania na parametry ogniw, zdecydowano się na regulator liniowy, aby nie trzeba było badać stabilności napięcia ładowanie i wielkości niepożądanych szumów, mogących wpłynąć na jakość wyników prób. Wybrany sposób ograniczenia prądu ma taką zaletę, że tłumi zakłócenia pochodzące z zasilania.
 
@@ -107,7 +144,7 @@ Ze względu na wybór tranzystora MOS, aby umożliwić kontrolę prądu prostymi
 Aby zapewnić możliwość całkowitego otwarcia lub zamknięcie tranzystora, konieczne jest użycie wzmacniacza typu rail-to-rail na wyjściu. Dodatkowo, ze względu na wydzielane w układzie ciepło, wybrano wzmacniacz o bardzo niskim współczynniku cieplnym wejściowego napięcia niezrównoważenia ('zero drift'). Ponieważ dokładność działania zależy od wejściowego napięcia niezrównoważenia, zwrócono uwagę także aby ten parametr był utrzymany na niskim poziomie ('zero offset').
 
 Wybrano wzmacniacz AD8551, który zapewnia 'input offset drift' nie większy niż $\mathrm{0.005 \mu V/\degree C}$ i bardzo niskie wejściowe napięcie niezrównoważenia $\mathrm{<1\mu V}$
-\subsection{Element pomiarowy}
+\subsection{Element pomiarowy: rezystor}
 Do mierzenia prądu płynącego przez ogniwo zastosowano rezystor o oporze $\mathrm{80m\Omega}$. Maksymalny spadek napięcia na elemencie pomiarowym, zapewniający poprawne działanie układy i odpowiednią dokładność pomiaru bez zbędnej komplikacji struktury przewidziany był na 250mV. Zastosowany opornik w przewidzianym zakresie użytkowania daje napięcie maksymalne $\mathrm{U_{rs(max)}=0.08\Omega * 3A = 240mV}$. Wybór nieoptymalnej wartości jest spowodowany brakiem dostępności na rynku opornika o tej rezystancji i dokładności dokładności 1\%. Maksymalna moc wydzielana na oporniku wynosi $\mathrm{R_s*I_{cell(max)}^2 = 0.08*3^2 = 0.72W}$, co maksymalnej dopuszczonej przez producenta mocy 3W, konstrukcji opartej o pytkę ze specjalnego stopu, umieszczeniu w dużej odległości od źródeł ciepła i dobrym jego odprowadzaniu zapewnia minimalizację błędów wynikających ze zmian oporu wraz z temperaturą.
 \subsection{Sterownik, regulator, zadajnik: mikrokontroler}
 W rozważanym układzie przed mikrokontrolerem stawia się następujące zadania:
@@ -120,7 +157,7 @@ W rozważanym układzie przed mikrokontrolerem stawia się następujące zadania
     \item obsługa przycisków i diód sygnalizacyjnych,
     \item komunikacja z komputerem.
 \end{itemize}
-W tym celu wybrano jednostkę ATtiny414, której istotne dla projektu parametry wyszczególniono poniżej:
+W tym celu wybrano jednostkę ATtiny414, której istotne dla projektu parametry wyszczególniono poniżej, za \cite{tiny414datasheet}:
 \begin{itemize}
     \item procesor: AVR RISC 8 bit, 20MHz, sprzętowe mnożenie,
     \item pamięć: 4kB program, 256B SRAM,
@@ -149,6 +186,7 @@ Sygnał z biegów jest sprowadzony do mikrokontrolera, alby mógł mierzyć napi
 
 Założono, że napięcie na rezystorze pomiarowym będzie nie większe niż 250mV, zatem sygnał do z przetwornika C/A musi zawierać się w tym samym przedziale. Aby w pełni wykorzystać rozdzielczość przetwornika, wybrano wewnętrzne napięcie odniesienia 2.5V, stąd najwyższe napięcie wyjściowe wyniesie 2.49V. Aby dopasować je do napięć na elemencie pomiarowym, wykorzystano dzielnik napięcia złożony z rezystorów 10k i 91k. Napięcie maksymalne na wejściu wzmacniacza jest równe $2.49*10/(10+91) = 0.247$V, czyli nieznacznie więcej niż przewidziane maksymalnie 0.24V na rezystorze. Takie dopasowanie poziomów jest zadowalające.
 \chapter{Realizacja prototypu}
+\section{Kolejność działania i bieżąca modyfikacja projektu\label{section:przerobki}}
 Płytka drukowana została wykonana metodą termotransferu. Z powodu braki soldermaski projekt realizowany jest etapami, aby zweryfikować poprawność montażu. Kolejność działań jest następująca:
 \begin{enumerate}
     \item Weryfikacja i ewentualna naprawa ścieżek.
@@ -161,14 +199,60 @@ Płytka drukowana została wykonana metodą termotransferu. Z powodu braki solde
     \item Budowa obciążenia testowego i pierwsze testy działania z docelowym rezystorem.
     \item Kalibracja przetwornika A/C.
     \item Montaż uchwytu ogniwa i testy na ogniwie.
-    
 \end{enumerate}
-\section{Kolejność działania i bieżąca modyfikacja projektu}
-\section{Stan finalny}
+Po wytrawieniu w skutek defektu warstwy zabezpieczającej ścieżka doprowadzająca sygnał z dodatniego bieguna ogniwa została rozpuszczona powodując przerwę około 1mm, co zostało naprawione mostkiem z drutu.
+
+Nowa seria mikrokontrolerów ATtiny (produkowana przez Microchip po przejęciu Atmel), do której należy wybrana jednostka, aby zwiększyć liczbę możliwych do wykorzystania pinów, jest programowana przez interfejs UPDI, który pozwala na komunikację half-duplex po jednym linii, pomijając połączenie masy. Aby nie kupować drogiego programatora producenta, wykorzystano rozwiązanie pozwalające na programowanie z użyciem zwykłego adaptera USB-TTL i rezystora\cite{pyupdi}.
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/pyupdi.png}}
+     \caption{Podłączenie programatora, wykorzystano grafikę z \cite{pyupdi}\label{img:pyupdi}}
+\end{figure}
+Producent zaleca podłączenie kondensatora chroniącego przed zakłóceniami pomiędzy pin resetu a masę, jednocześnie ostrzegając, że dla niektórych innych interfejsów może uniemożliwić to ich funkcjonowanie\cite{avr_hardware}. Jak sprawdzono, konieczne było wylutowanie kondensatora także w przypadku UPDI.
+
+Podczas montażu diód sygnalizacyjnych okazało się, że użyty footprint jest przeznaczony dla elementu ze wspólną katodą, a zakupiony komponent miał niezależne katody, położone na innych pinach. Obrócenie i włączanie zwieraniem do masy zamiast do zasilania umożliwiło zachowanie PCB.
+
+Podczas weryfikacji działania przetworników stwierdzono, że układ C/A działa jak zakładano, a układ A/C zaniża mierzone napięcie o około 0.5V. Błąd ten był stały w mierzonych przedziałach, więc odpowiednia kalibracja, przeprowadzona w późniejszych etapach pozwoliła go wyeliminować.
+
+Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2 ścieżek i dodanie 3 rezystorów $0\Omega$ pozwoliło w czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
+
+Po zamontowaniu tranzystora stwierdzono, że w skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w większości zastosowań), a co za tym idzie, dren ze źródłem był odwrócony. Po wykryciu, że powodem przepływu prądu i pewnego spadku napięcia jest wewnętrzna dioda, i odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Wykorzystano zakupiony radiator z blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degree C/W}$ przy naturalnej konwekcji. 
+
+Ponieważ podanie zbyt dużego napięcia na ogniwo lub zwarcie biegunów może prowadzić do zniszczenia ogniwa a nawet zapalenia się, aby bezpiecznie sprawdzić działanie układu wykonano obciążenie testowe z diód o odpowiedniej mocy, którego schemat przedstawiono na rys. \ref{img:testload}. Urządzenie to pozwala także na bezpieczne rozładowanie ogniw do około 2.5V.
+Aby ułatwić testy, zgodnie z metodą 'hardware-in-the-loop', cały proces nadzoruje skrypt w środowisku MATLAB, a mikroprocesor zajmuje się wymianą danych między peryferiami a komputerem.
+\begin{figure}[hbtp]
+    \centering
+    \resizebox{0.5\linewidth}{!}{\includegraphics[]{img/testload.png}}
+    \caption{Schemat obciążenia testowego. \label{img:testload}}
+\end{figure}
+
+Wykorzystując fakt, że napięcie przewodzenia diód zmienia się w zależności od prądu, wykonano pomiary przez przetwornik A/C i niezależny woltomierz, tak aby skalibrować przetwornik. Zebrano dane dla obu stron ogniwa, i dla osiągnięcia większej dokładności skalibrowano je niezależnie.
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{fity pomiarów ADC tu}
+     \caption{Kalibracja przetwornika A/C \label{img:ADCfitting}}
+\end{figure}
+Dzięki temu odwzorowano pomiary woltomierzem z dokładnością do 0.01V.
+
+Testy wykonane na docelowych ogniwach przebiegły pomyślnie. Ze względu na dużą rezystancje wewnętrzną głęboko rozładowanych ogniw, moc wydzielana na tranzystorze nigdy nie osiąga zakładanej wartości. Temperatura na tranzystorze nie przekracza maksymalnie dopuszczalnej.
+
+\section{Stan finalny części sprzętowej}
+Ostatecznie projekt wykonany jest na bazie płytki PCB z oryginalnego projektu z modyfikacjami z punktu \ref{section:przerobki}. Sprawdzono z pozytywnym wynikiem stabilność funkcjonowania dla prądu 2A i napięcia początkowego ogniwa 2.5V, co przekłada się na około 3.7W mocy wydzielanej na tranzystorze. Na testy większych obciążeń nie pozwalają posiadane ogniwa.
+
 \section{Implementacja potrzebnych funkcjonalności}
+Ze względu na fakt, że przeznaczeniem urządzenia są zadania eksperymentalne, które zawsze zakładają zbieranie danych na komputerze, zdecydowano o implementacji całej funkcjonalności za pomocą skryptów w środowisku MATLAB. Pozwala to także na bieżącą obserwację parametrów procesu.
+
+Zaimplementowane funkcjonalności pozwalają na ciągłe monitorowanie napięcia na ogniwie oraz realizacje protokołu ładowania CC-CV do zadanych wartości napięcia oraz prądu maksymalnego i granicznego końcowego.
+
+Skrypt ładujący CC-CV działa następująco:
+\begin{enumerate}
+    \item Sprawdzane są napięcia na stykach uchwytu. Jeżeli nie mieszczą się w założonym przedziale, ładowanie jest wyłączane i użytkownik jest informowany o błędzie.
+    \item Gdy użytkownik potwierdzi parametry ładowania, urządzenie utrzymuje stały prąd do momentu osiągnięcia napięcia docelowego.
+    \item Po osiągnięciu napięcia będącego różne od docelowego o pewien ustalony próg zadziałania (np. 0.03V), poziom ten jest utrzymywany przez regulator PI. 
+    \item Po osiągnięciu wartości prądu poniżej progu końcowego lub wystąpieniu błędu, łądowanie jest wyłaczane, a użytkownik powiadamiany o rezultacie.
+\end{enumerate}
+
 
 \chapter{Testy i weryfikacja}
-
+Ponieważ rezystancja wewnętrzna ogniwa ulega w procesie ciągłym zmianom, co więcej, szybkość tych zmian także nie jest stała, stąd jakość regulacji może być zdecydowanie polepszona użyciem takich technik jak np. gain scheduling.
 
 
 
@@ -179,4 +263,8 @@ Równania powinny być numerowane jak równanie \ref{entropy}.
 \begin{equation}
 H(X) = -\sum_{i=0}^n P(x_i) \log_2 P(x_i).\label{entropy}
 \end{equation}
+
+\bibliographystyle{plain} 
+\bibliography{bibiking}
+
 \end{document}
