@@ -246,18 +246,30 @@ Skrypt ładujący CC-CV działa następująco:
 \begin{enumerate}
     \item Sprawdzane są napięcia na stykach uchwytu. Jeżeli nie mieszczą się w założonym przedziale, ładowanie jest wyłączane i użytkownik jest informowany o błędzie.
     \item Gdy użytkownik potwierdzi parametry ładowania, urządzenie utrzymuje stały prąd do momentu osiągnięcia napięcia docelowego.
-    \item Po osiągnięciu napięcia będącego różne od docelowego o pewien ustalony próg zadziałania (np. 0.03V), poziom ten jest utrzymywany przez regulator PI. 
-    \item Po osiągnięciu wartości prądu poniżej progu końcowego lub wystąpieniu błędu, łądowanie jest wyłaczane, a użytkownik powiadamiany o rezultacie.
+    \item Po osiągnięciu napięcia będącego rożnym od docelowego o pewien ustalony próg zadziałania (np. -0.03V), poziom ustalony przed rozpoczęciem jest utrzymywany przez regulator PI. 
+    \item Po osiągnięciu wartości prądu poniżej progu końcowego lub wystąpieniu błędu, ładowanie jest wyłączane, a użytkownik powiadamiany o rezultacie.
 \end{enumerate}
 
 
 \chapter{Testy i weryfikacja}
+
+
 Ponieważ rezystancja wewnętrzna ogniwa ulega w procesie ciągłym zmianom, co więcej, szybkość tych zmian także nie jest stała, stąd jakość regulacji może być zdecydowanie polepszona użyciem takich technik jak np. gain scheduling.
+Mimo, że układ jest statyczny względem zadanego prądu, odpowiednio duże wzmocnienie regulatora PI zapewnia akceptowalne mały uchyb w całym czasie regulacji. 
+Przebieg napięć i prądów dla procesu przy nastawach dobranych 'na wyczucie' przedstawiono na rys. dla ładowania odniwa o pojemności nominalnej 2700mAh prądem 2.7A do napięcia 4.1V kończąc ładowanie przy prądzie 100mA
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics{nazwa pliku grafiki}}
+     \caption{Pierwsze testy: ChargeCCCV(2700, 1, 4.1, 100) \label{img:1strun}}
+\end{figure}
+Jak można zaobserwować, proces został przerwany zanim osiągnął pożądany prąd, miało to miejsce w skutek błędów komunikacji.
 
 
 
 \newpage
-
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics{nazwa pliku grafiki}}
+     \caption{Podpis rysunku. \label{img:!_some_label}}
+\end{figure}
 
 Równania powinny być numerowane jak równanie \ref{entropy}.
 \begin{equation}
