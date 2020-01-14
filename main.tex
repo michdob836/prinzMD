@@ -185,6 +185,17 @@ Rezystor pomiarowy znajduje się między ujemnym biegunem ogniwa i masą, maksym
 Sygnał z biegów jest sprowadzony do mikrokontrolera, alby mógł mierzyć napięcie na ogniwie, a napięcie na rezystorze pomiarowym względem wspólnej masy doprowadzone jest również do wzmacniacza operacyjnego. Aby zabezpieczyć się przed zakłóceniami pochodzącymi od układu próbkującego przetwornika A/C, sygnał z ujemnego bieguna jest doprowadzony do mikrokontrolera przez rezystor 1k i buforowany na miejscu kondensatorem 100nF. Kondensator znajduje się również przy doprowadzeniu sygnału z bieguna dodatniego, aby ograniczyć ewentualny wpływ impedancji linii.
 
 Założono, że napięcie na rezystorze pomiarowym będzie nie większe niż 250mV, zatem sygnał do z przetwornika C/A musi zawierać się w tym samym przedziale. Aby w pełni wykorzystać rozdzielczość przetwornika, wybrano wewnętrzne napięcie odniesienia 2.5V, stąd najwyższe napięcie wyjściowe wyniesie 2.49V. Aby dopasować je do napięć na elemencie pomiarowym, wykorzystano dzielnik napięcia złożony z rezystorów 10k i 91k. Napięcie maksymalne na wejściu wzmacniacza jest równe $2.49*10/(10+91) = 0.247$V, czyli nieznacznie więcej niż przewidziane maksymalnie 0.24V na rezystorze. Takie dopasowanie poziomów jest zadowalające.
+\section{Weryfikacja projektu za pomocą symulacji SPICE}
+Istotny fragment projektu został zamodelowany w programie LTSpice jak na rys. \ref{img:modelLTv1}
+\begin{figure}[hbtp]
+\centering
+     \resizebox{0.8\linewidth}{!}{\includegraphics{img/odlschem.png}}
+     \caption{Model w części wykonawczej w LTSpice. \label{img:modelLTv1}}
+\end{figure}
+Model ogniwa został przyjęty za \cite{8759769_cellmodel1storder}. W praktyce dla symulacji znaczenie ma tylko rezystancja szeregowa równa 120m$\Omega$ i napięcie na ogniwie.
+
+Symulacja typu transient dla prądów 230 i 2730mA przy napięciach na ogniwie 2.5, 4 i 4.2V wykazała poprawne zachowanie układu, napięcia bez oscylacji osiągały zadane wartości.
+
 \chapter{Realizacja prototypu}
 \section{Kolejność działania i bieżąca modyfikacja projektu\label{section:przerobki}}
 Płytka drukowana została wykonana metodą termotransferu. Z powodu braki soldermaski projekt realizowany jest etapami, aby zweryfikować poprawność montażu. Kolejność działań jest następująca:
@@ -256,14 +267,35 @@ Skrypt ładujący CC-CV działa następująco:
 
 Ponieważ rezystancja wewnętrzna ogniwa ulega w procesie ciągłym zmianom, co więcej, szybkość tych zmian także nie jest stała, stąd jakość regulacji może być zdecydowanie polepszona użyciem takich technik jak np. gain scheduling.
 Mimo, że układ jest statyczny względem zadanego prądu, odpowiednio duże wzmocnienie regulatora PI zapewnia akceptowalne mały uchyb w całym czasie regulacji. 
-Przebieg napięć i prądów dla procesu przy nastawach dobranych 'na wyczucie' przedstawiono na rys. dla ładowania odniwa o pojemności nominalnej 2700mAh prądem 2.7A do napięcia 4.1V kończąc ładowanie przy prądzie 100mA
+Wykorzystanie przetwornika A/C na ujemnym biegunie ogniwa nie pozwala na dokładne pomiary wartości prądu, ale daje podgląd dynamiki jego zmian. Przebieg napięć i prądów dla procesu przy wstępnych nastawach przedstawiono na rys. dla ładowania ogniwa o pojemności nominalnej 2700mAh prądem 1.9A do napięcia 4.0V kończąc ładowanie przy prądzie 1000mA.
 \begin{figure}[hbtp]
-     \resizebox{\linewidth}{!}{\includegraphics{nazwa pliku grafiki}}
-     \caption{Pierwsze testy: ChargeCCCV(2700, 1, 4.1, 100) \label{img:1strun}}
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/bezkondensatorze.png}}
+     \caption{Pierwszy test. \label{img:1strun}}
 \end{figure}
-Jak można zaobserwować, proces został przerwany zanim osiągnął pożądany prąd, miało to miejsce w skutek błędów komunikacji.
+W miarę zbliżania się do napięcia 4V, między 5. a 21. minutą, można zaobserwować narastające szumy na napięciu ogniwa. Są one mieszczą się one zazwyczaj w zakładanej tolerancji dla napięcia ładowania, ale ich szybkozmienny charakter sugeruje występowanie w układzie oscylacji. Jako że sygnał z przetwornika jest uśrednieniem 64 kolejnych pomiarów, oscylacje muszą być bardzo znaczące.
+Najbardziej prawdopodobnym ich źródłem, jako, że objawiają się przede wszystkim wahaniami prądu, jest wadliwy projekt sprzężenia zwrotnego od rezystora pomiarowego do tranzystora. Za pomocą symulacji SPICE zweryfikowano zapas fazy układu dla zestawu parametrów, dla którego wystąpiły największe oscylacje.
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/bode_nocap.png}}
+     \caption{Analiza małosygnałowa dla układu oscylującego: wykres Bodego \label{img:1strun}}
+\end{figure}
+W rezultacie stwierdzono, że zapas fazy wynosi około 10\degree. Teoretycznie układ powinien być stabilny dla każdego zapasu fazy > 0\degree, ale w praktyce wiele nieprzewidzianych czynników może doprowadzić do jego obniżenia, na przykład pojemność ścieżki pomiędzy wzmacniaczem a bramką tranzystora (która sama w sobie tworzy kondensator). W praktyce przyjmuje się że zapas fazy powinien wynosić 45\degree \cite{PhaseMargin_TERRELL1996383}.
 
+Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano kondensator pomiędzy wejście odwracające a wyjście wzmacniacza (rys. \ref{img:HereYouAreMrCap}), co zwiększyło zapas fazy do 45\degree (rys. \ref{img:MrBodeWithCap}).
+\begin{figure}[hbtp]
+    \centering
+     \resizebox{0.7\linewidth}{!}{\includegraphics[]{img/how_cap_was_added.png}}
+     \caption{Schemat układu lepiej tłumiącego drgania. \label{img:HereYouAreMrCap}}
+\end{figure}
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/bode_withcap.png}}
+     \caption{Badanie zapasu fazy dla po dodaniu kompensatora. \label{img:MrBodeWithCap}}
+\end{figure}
 
+Po zastosowanych zmianach:
+\begin{figure}[hbtp]
+     \resizebox{\linewidth}{!}{\includegraphics{img/prettyChargingAaaaandFailure.png}}
+     \caption{Przebieg procesu ładowania. Widoczne uszkodzenie ogniwa. \label{img:PrettyChargeWithCellFailure}}
+\end{figure}
 
 \newpage
 \begin{figure}[hbtp]
