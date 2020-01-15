@@ -36,6 +36,10 @@ Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii d
 
 Niniejszy projekt inżynierski wpisuje się w ten trend, proponując ładowarkę pozwalającą z dużą elastycznością kształtować przebieg procesu ładowania. Docelowo urządzenie to ma umożliwiać przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z uwagi na dominującą pozycję na rynku ogniw w standardzie 18650, taki rozmiar został wybrany za docelowy. 
 
+W projekcie położony jest nacisk na stworzenie regulatora, pozwalającego realizować założone przebiegi napięcia i prądu na ogniwie. Zadanie nastawiania prądu jest zrealizowane za pomocą tranzystora MOS, pracującego w zakresie triodowym, którego otwieraniem steruje wzmacniacz operacyjny, tworząc źródło prądowe. Nad napięciem na ogniwie czuwa regulator PI, który tak steruje prądem, aby utrzymać je w założonym przedziale. Nad całością operacji kontrolę sprawuje skrypt w środowisku MATLAB, który odpowiada za wypracowywanie sygnału sterującego prądem oraz zbieranie i wyświetlanie danych z procesu.
+
+W trakcie prac użyte zostały 2 modele ogniwa. Podczas projektowania części sprzętowej wykorzystano model Thevenina 1. rzędu, a podczas dobierania nastaw regulatora wykorzystywano transmitancję operatorową, której parametry pobrano badając obiekt rzeczywisty. 
+
 \chapter{Teoria}
 \section{Budowa i specyfika działania ogniw litowo-jonowych}
 Historia użytecznych ogniw na bazie litu sięga lat 70, kiedy Adam Heller opatentował pierwszą kompozycję chemiczną anody, katody i elektrolitu \cite{heller1975electrochemical}, pozwalającą na skonstruowanie baterii w cenach akceptowalnych przez rynek. Od tego czasu dostępnych jest wiele technologii wykonania takich ogniw, różniących się ze względu na wykorzystane materiały. Zasadę działania obecnie już wycofywanej technologii przedstawia rys. \ref{img:liion_structure}.
@@ -66,16 +70,41 @@ LTO & 2.85 & 1.8 & 1C & 3000-7000\\ \hline
 \end{table}
 Ładowarka była projektowana dla najpopularniejszych ogniw na rynku, jednak dzięki odpowiednio dobranym komponentom jest w stanie działać także dla ogniw w technologii LTO, z ograniczeniem prądu ładowania.
 
-\section{Schematy ładowania}
-Ogniwa litowo jonowe, w większości przypadków optymalizowane aby osiągnąć maksymalną gęstość energetyczną, wykazują dużą wrażliwość na przekroczenie ograniczeń prądowych ładowania\cite{TOMASZEWSKA2019100011}, które w dobie rozwoju samochodów elektrycznych są czynnikiem mocno ograniczającym szeroką popularyzację. W związku z tym, badane są rozmaite schematy ładowania. Odpowiedni dobór profilu prądowego pozwala na podwojenie żywotności baterii w stosunku do ładowania profilem CC-CV, przy czasie ładowania dłuższym o około 15\%\cite{SCHINDLER2018364}.
+\section{Strategie ładowania}
+Ogniwa litowo jonowe, w większości przypadków optymalizowane aby osiągnąć maksymalną gęstość energetyczną, wykazują dużą wrażliwość na przekroczenie ograniczeń prądowych ładowania\cite{TOMASZEWSKA2019100011}, które w dobie rozwoju samochodów elektrycznych są czynnikiem mocno ograniczającym szeroką popularyzację. W związku z tym, badane są rozmaite strategie ładowania. Odpowiedni dobór profilu prądowego pozwala na podwojenie żywotności baterii w stosunku do ładowania profilem CC-CV, przy czasie ładowania dłuższym o około 15\%\cite{SCHINDLER2018364}.
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/protocols.jpg}}
-     \caption{Różne schematy ładowania, wykresy zaczerpnięte z \cite{TOMASZEWSKA2019100011}\label{img:charging_protocols}}
+     \caption{Różne strategie ładowania \cite{TOMASZEWSKA2019100011}.\label{img:charging_protocols}}
 \end{figure}
 
 Najbardziej rozpowszechnionym i rekomendowanym przez producentów schematem ładowania jest CC-CV, czyli utrzymywanie stałego prądu do momentu osiągnięcia zadanego napięcia maksymalnego, potem utrzymywanie tego napięcia, aż prąd spadnie poniżej zadanej wartości.
 
 Jeżeli zaimplementowane zostaną metody programowej kontroli tych parametrów, możliwe jest także wykorzystanie dowolnego innego protokołu, tak długo jak jego wymagania prądowe i napięciowe mogą być spełnione przez ładowarkę.
+
+\section{Model matematyczny ogniwa}
+Powstało wiele dokładnych modeli\cite{1634598_BATT_MODELS} ogniw litowo-jonowych, modelujących stan naładowania i odpowiedzi czasowe z dokładnością poniżej 1\%, jednak na potrzeby weryfikacji jakości regulacji prądu na poziomie sprzętowym, ze względu na małą dynamikę zmian, użyty został zastępczy model elektryczny 1. rzędu o parametrach jak w \cite{8759769_cellmodel1storder} (rys. )\ref{img:thevenin_model}. Dzięki niemu możliwe było prowadzenie symulacji zachowania się układu w LTSpice.
+\begin{figure}[hbtp]
+    \centering
+     \resizebox{0.5\linewidth}{!}{\includegraphics[]{img/cell_model.png}}
+     \caption{Model elektryczny ogniwa..\label{img:thevenin_model}}
+\end{figure}
+
+W celu znalezienia zadowalających nastaw regulatora napięcia, na podstawie charakteru odpowiedzi układu określono jego przybliżony model. Obserwacja kształtu odpowiedzi na skokową zmianę parametrów pozwoliła na stwierdzenie struktury transmitancji \ref{eq:transmit_modelu}. Znaczną 'pojemność', w sensie analogu elektrycznego ogniwa, odpowiadającą za powolny wzrost napięcia podczas ładowania, przybliżono za pomocą całki.
+\begin{equation}
+    K(s) = k\frac{s\tau_1 + 1}{s(s\tau_2 + 1)}
+    \label{eq:transmit_modelu}
+\end{equation}
+Parametry transmitancji znaleziono za pomocą MATLAB Model Identification Toolbox.
+
+\section{Regulator}
+Aby realizować wybraną strategię, konieczne jest użycie struktury regulatora zapewniającej stabilne działanie nawet przy pewnej zmienności parametrów obiektu, wynikającej z różnic technologicznych pomiędzy ogniwami. Wymagania te spełnia, przy jednoczesnym zachowaniu łatwości implementacji, regulator PI.
+\begin{equation}
+     u(t)=k_{p}\left[e(t)+{\frac {1}{T_{i}}}\int _{0}^{t}e(\tau )d\tau \right]
+     \label{eq:PI_timebased}
+\end{equation}
+Ze względu na częstotliwość próbkowania znacznie większa od stałych czasowych procesu wykorzystano możliwość analizy regulatora jako układu ciągłego.
+
+Strategie ładowania zakładają możliwość utrzymywania zadanego prądu (regulator sprzętowy) lub zadanego napięcia (regulator programowy), dlatego konieczne jest zapewnienie bezuderzeniowego przełączania między trybami. Jest to realizowane przez ciągłe wyliczanie odpowiedniej wartości całki podczas trybu stabilizacji prądu. Jednocześnie wartość procesowa jaką jest zadany prąd jest wspólna dla obu trybów.
 
 
 \chapter{Projekt urządzenia}
@@ -145,7 +174,7 @@ Aby zapewnić możliwość całkowitego otwarcia lub zamknięcie tranzystora, ko
 
 Wybrano wzmacniacz AD8551, który zapewnia 'input offset drift' nie większy niż $\mathrm{0.005 \mu V/\degree C}$ i bardzo niskie wejściowe napięcie niezrównoważenia $\mathrm{<1\mu V}$
 \subsection{Element pomiarowy: rezystor}
-Do mierzenia prądu płynącego przez ogniwo zastosowano rezystor o oporze $\mathrm{80m\Omega}$. Maksymalny spadek napięcia na elemencie pomiarowym, zapewniający poprawne działanie układy i odpowiednią dokładność pomiaru bez zbędnej komplikacji struktury przewidziany był na 250mV. Zastosowany opornik w przewidzianym zakresie użytkowania daje napięcie maksymalne $\mathrm{U_{rs(max)}=0.08\Omega * 3A = 240mV}$. Wybór nieoptymalnej wartości jest spowodowany brakiem dostępności na rynku opornika o tej rezystancji i dokładności dokładności 1\%. Maksymalna moc wydzielana na oporniku wynosi $\mathrm{R_s*I_{cell(max)}^2 = 0.08*3^2 = 0.72W}$, co maksymalnej dopuszczonej przez producenta mocy 3W, konstrukcji opartej o pytkę ze specjalnego stopu, umieszczeniu w dużej odległości od źródeł ciepła i dobrym jego odprowadzaniu zapewnia minimalizację błędów wynikających ze zmian oporu wraz z temperaturą.
+Do mierzenia prądu płynącego przez ogniwo zastosowano rezystor o oporze $\mathrm{80m\Omega}$. Maksymalny spadek napięcia na elemencie pomiarowym, zapewniający poprawne działanie układy i odpowiednią dokładność pomiaru bez zbędnej komplikacji struktury przewidziany był na 250mV. Zastosowany opornik w przewidzianym zakresie użytkowania daje napięcie maksymalne $\mathrm{U_{rs(max)}=0.08\Omega * 3\,A = 240\,mV}$. Wybór nieoptymalnej wartości jest spowodowany brakiem dostępności na rynku opornika o tej rezystancji i dokładności dokładności 1\%. Maksymalna moc wydzielana na oporniku wynosi $\mathrm{R_s*I_{cell(max)}^2 = 0.08*3^2 = 0.72\,W}$, co maksymalnej dopuszczonej przez producenta mocy 3 W, konstrukcji opartej o pytkę ze specjalnego stopu, umieszczeniu w dużej odległości od źródeł ciepła i dobrym jego odprowadzaniu zapewnia minimalizację błędów wynikających ze zmian oporu wraz z temperaturą.
 \subsection{Sterownik, regulator, zadajnik: mikrokontroler}
 W rozważanym układzie przed mikrokontrolerem stawia się następujące zadania:
 \begin{itemize}
@@ -159,32 +188,32 @@ W rozważanym układzie przed mikrokontrolerem stawia się następujące zadania
 \end{itemize}
 W tym celu wybrano jednostkę ATtiny414, której istotne dla projektu parametry wyszczególniono poniżej, za \cite{tiny414datasheet}:
 \begin{itemize}
-    \item procesor: AVR RISC 8 bit, 20MHz, sprzętowe mnożenie,
-    \item pamięć: 4kB program, 256B SRAM,
+    \item procesor: AVR RISC 8 bit, 20 MHz, sprzętowe mnożenie,
+    \item pamięć: 4 kB program, 256 B SRAM,
     \item DAC: 8 bit, wewnętrzne napięcie odniesienia,
     \item ADC: 10 bit, akumulacja do 64 pomiarów, wewnętrzne napięcie odniesienia, 
-    \item nap. odniesienia: 4.3, 2.5, 1.5, 1.1, 0.55V,
+    \item nap. odniesienia: 4.3, 2.5, 1.5, 1.1, 0.55 V,
     \item sprzętowe wsparcie UART,
     \item I/O: 12 programowalnych linii
 \end{itemize}
 
 \section{Projekt PCB}
-Projekt płytki drukowanej, przedstawiony na rys. \ref{img:pcb_colored} został wykonany w darmowym środowisku KiCad. Wykonanie projektu przewidziano na laminacie dwustronnym o grubości miedzi 70um.
+Projekt płytki drukowanej, przedstawiony na rys. \ref{img:pcb_colored} został wykonany w darmowym środowisku KiCad. Wykonanie projektu przewidziano na laminacie dwustronnym o grubości miedzi 70 um.
 
 \begin{figure}[hbtp]
-     \resizebox{\linewidth}{!}{\includegraphics[]{img/plytka_kolorowa.png}}
-     \caption{Schemat części wykonawczej ładowarki. \label{img:pcb_colored}}
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/plytka_bw.png}}
+     \caption{Projekt PCB. \label{img:pcb_colored}}
 \end{figure}
 
-Aby zapewnić odporność na zakłócenia, na ile to możliwe zachowano ciągłość masy GND na spodniej powierzchni płytki. W tym samym celu rozlano +5V na górnej powierzchni. 
+Aby zapewnić odporność na zakłócenia, na ile to możliwe zachowano ciągłość masy GND na spodniej powierzchni płytki. W tym samym celu rozlano +5 V na górnej powierzchni. 
 
-Aby umożliwić przetestowanie kilku tranzystorów jak zaznaczono w punkcie \ref{section:mosfet}, przewidziane są pola na 3 różne standardy wyprowadzeń. Wokół niech znajdują się otwory, w których przewidziany jest montaż odcinków drutu 0.75mm$^2$, pełniących rolę radiatora.
+Aby umożliwić przetestowanie kilku tranzystorów jak zaznaczono w punkcie \ref{section:mosfet}, przewidziane są pola na 3 różne standardy wyprowadzeń. Wokół niech znajdują się otwory, w których przewidziany jest montaż odcinków drutu 0.75 mm$^2$, pełniących rolę radiatora.
 
 Rezystor pomiarowy znajduje się między ujemnym biegunem ogniwa i masą, maksymalnie oddalony od źródła ciepła jakim jest tranzystor. 
 
 Sygnał z biegów jest sprowadzony do mikrokontrolera, alby mógł mierzyć napięcie na ogniwie, a napięcie na rezystorze pomiarowym względem wspólnej masy doprowadzone jest również do wzmacniacza operacyjnego. Aby zabezpieczyć się przed zakłóceniami pochodzącymi od układu próbkującego przetwornika A/C, sygnał z ujemnego bieguna jest doprowadzony do mikrokontrolera przez rezystor 1k i buforowany na miejscu kondensatorem 100nF. Kondensator znajduje się również przy doprowadzeniu sygnału z bieguna dodatniego, aby ograniczyć ewentualny wpływ impedancji linii.
 
-Założono, że napięcie na rezystorze pomiarowym będzie nie większe niż 250mV, zatem sygnał do z przetwornika C/A musi zawierać się w tym samym przedziale. Aby w pełni wykorzystać rozdzielczość przetwornika, wybrano wewnętrzne napięcie odniesienia 2.5V, stąd najwyższe napięcie wyjściowe wyniesie 2.49V. Aby dopasować je do napięć na elemencie pomiarowym, wykorzystano dzielnik napięcia złożony z rezystorów 10k i 91k. Napięcie maksymalne na wejściu wzmacniacza jest równe $2.49*10/(10+91) = 0.247$V, czyli nieznacznie więcej niż przewidziane maksymalnie 0.24V na rezystorze. Takie dopasowanie poziomów jest zadowalające.
+Założono, że napięcie na rezystorze pomiarowym będzie nie większe niż 250mV, zatem sygnał do z przetwornika C/A musi zawierać się w tym samym przedziale. Aby w pełni wykorzystać rozdzielczość przetwornika, wybrano wewnętrzne napięcie odniesienia 2.5V, stąd najwyższe napięcie wyjściowe wyniesie 2.49 V. Aby dopasować je do napięć na elemencie pomiarowym, wykorzystano dzielnik napięcia złożony z rezystorów 10k i 91k. Napięcie maksymalne na wejściu wzmacniacza jest równe $2.49*10/(10+91) = 0.247$ V, czyli nieznacznie więcej niż przewidziane maksymalnie 0.24 V na rezystorze. Takie dopasowanie poziomów jest zadowalające.
 \section{Weryfikacja projektu za pomocą symulacji SPICE}
 Istotny fragment projektu został zamodelowany w programie LTSpice jak na rys. \ref{img:modelLTv1}
 \begin{figure}[hbtp]
@@ -194,7 +223,7 @@ Istotny fragment projektu został zamodelowany w programie LTSpice jak na rys. \
 \end{figure}
 Model ogniwa został przyjęty za \cite{8759769_cellmodel1storder}. W praktyce dla symulacji znaczenie ma tylko rezystancja szeregowa równa 120m$\Omega$ i napięcie na ogniwie.
 
-Symulacja typu transient dla prądów 230 i 2730mA przy napięciach na ogniwie 2.5, 4 i 4.2V wykazała poprawne zachowanie układu, napięcia bez oscylacji osiągały zadane wartości.
+Symulacja typu transient dla prądów 230 i 2730 mA przy napięciach na ogniwie 2.5, 4 i 4.2 V wykazała poprawne zachowanie układu, napięcia bez oscylacji osiągały zadane wartości.
 
 \chapter{Realizacja prototypu}
 \section{Kolejność działania i bieżąca modyfikacja projektu\label{section:przerobki}}
@@ -215,7 +244,8 @@ Po wytrawieniu w skutek defektu warstwy zabezpieczającej ścieżka doprowadzaj�
 
 Nowa seria mikrokontrolerów ATtiny (produkowana przez Microchip po przejęciu Atmel), do której należy wybrana jednostka, aby zwiększyć liczbę możliwych do wykorzystania pinów, jest programowana przez interfejs UPDI, który pozwala na komunikację half-duplex po jednym linii, pomijając połączenie masy. Aby nie kupować drogiego programatora producenta, wykorzystano rozwiązanie pozwalające na programowanie z użyciem zwykłego adaptera USB-TTL i rezystora\cite{pyupdi}.
 \begin{figure}[hbtp]
-     \resizebox{\linewidth}{!}{\includegraphics[]{img/pyupdi.png}}
+\centering
+     \resizebox{0.8\linewidth}{!}{\includegraphics[]{img/pyupdi.png}}
      \caption{Podłączenie programatora, wykorzystano grafikę z \cite{pyupdi}\label{img:pyupdi}}
 \end{figure}
 Producent zaleca podłączenie kondensatora chroniącego przed zakłóceniami pomiędzy pin resetu a masę, jednocześnie ostrzegając, że dla niektórych innych interfejsów może uniemożliwić to ich funkcjonowanie\cite{avr_hardware}. Jak sprawdzono, konieczne było wylutowanie kondensatora także w przypadku UPDI.
@@ -226,9 +256,9 @@ Podczas weryfikacji działania przetworników stwierdzono, że układ C/A dział
 
 Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2 ścieżek i dodanie 3 rezystorów $0\Omega$ pozwoliło w czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
 
-Po zamontowaniu tranzystora stwierdzono, że w skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w większości zastosowań), a co za tym idzie, dren ze źródłem był odwrócony. Po wykryciu, że powodem przepływu prądu i pewnego spadku napięcia jest wewnętrzna dioda, i odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Wykorzystano zakupiony radiator z blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degree C/W}$ przy naturalnej konwekcji. 
+Po zamontowaniu tranzystora stwierdzono, że w skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w większości zastosowań), a co za tym idzie, dren ze źródłem był odwrócony. Po wykryciu, że powodem przepływu prądu i pewnego spadku napięcia jest wewnętrzna dioda, i odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Wykorzystano zakupiony radiator z blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degree \,C/W}$ przy naturalnej konwekcji. 
 
-Ponieważ podanie zbyt dużego napięcia na ogniwo lub zwarcie biegunów może prowadzić do zniszczenia ogniwa a nawet zapalenia się, aby bezpiecznie sprawdzić działanie układu wykonano obciążenie testowe z diód o odpowiedniej mocy, którego schemat przedstawiono na rys. \ref{img:testload}. Urządzenie to pozwala także na bezpieczne rozładowanie ogniw do około 2.5V.
+Ponieważ podanie zbyt dużego napięcia na ogniwo lub zwarcie biegunów może prowadzić do zniszczenia ogniwa a nawet zapalenia się, aby bezpiecznie sprawdzić działanie układu wykonano obciążenie testowe z diód o odpowiedniej mocy, którego schemat przedstawiono na rys. \ref{img:testload}. Urządzenie to pozwala także na bezpieczne rozładowanie ogniw do około 2.5 V.
 Aby ułatwić testy, zgodnie z metodą 'hardware-in-the-loop', cały proces nadzoruje skrypt w środowisku MATLAB, a mikroprocesor zajmuje się wymianą danych między peryferiami a komputerem.
 \begin{figure}[hbtp]
     \centering
@@ -241,12 +271,12 @@ Wykorzystując fakt, że napięcie przewodzenia diód zmienia się w zależnośc
      \resizebox{\linewidth}{!}{fity pomiarów ADC tu}
      \caption{Kalibracja przetwornika A/C \label{img:ADCfitting}}
 \end{figure}
-Dzięki temu odwzorowano pomiary woltomierzem z dokładnością do 0.01V.
+Dzięki temu odwzorowano pomiary woltomierzem z dokładnością do 0.01 V.
 
 Testy wykonane na docelowych ogniwach przebiegły pomyślnie. Ze względu na dużą rezystancje wewnętrzną głęboko rozładowanych ogniw, moc wydzielana na tranzystorze nigdy nie osiąga zakładanej wartości. Temperatura na tranzystorze nie przekracza maksymalnie dopuszczalnej.
 
 \section{Stan finalny części sprzętowej}
-Ostatecznie projekt wykonany jest na bazie płytki PCB z oryginalnego projektu z modyfikacjami z punktu \ref{section:przerobki}. Sprawdzono z pozytywnym wynikiem stabilność funkcjonowania dla prądu 2A i napięcia początkowego ogniwa 2.5V, co przekłada się na około 3.7W mocy wydzielanej na tranzystorze. Na testy większych obciążeń nie pozwalają posiadane ogniwa.
+Ostatecznie projekt wykonany jest na bazie płytki PCB z oryginalnego projektu z modyfikacjami z punktu \ref{section:przerobki}. Sprawdzono z pozytywnym wynikiem stabilność funkcjonowania dla prądu 2A i napięcia początkowego ogniwa 2.5 V, co przekłada się na około 3.7 W mocy wydzielanej na tranzystorze. Na testy większych obciążeń nie pozwalają posiadane ogniwa.
 
 \section{Implementacja potrzebnych funkcjonalności}
 Ze względu na fakt, że przeznaczeniem urządzenia są zadania eksperymentalne, które zawsze zakładają zbieranie danych na komputerze, zdecydowano o implementacji całej funkcjonalności za pomocą skryptów w środowisku MATLAB. Pozwala to także na bieżącą obserwację parametrów procesu.
@@ -257,22 +287,21 @@ Skrypt ładujący CC-CV działa następująco:
 \begin{enumerate}
     \item Sprawdzane są napięcia na stykach uchwytu. Jeżeli nie mieszczą się w założonym przedziale, ładowanie jest wyłączane i użytkownik jest informowany o błędzie.
     \item Gdy użytkownik potwierdzi parametry ładowania, urządzenie utrzymuje stały prąd do momentu osiągnięcia napięcia docelowego.
-    \item Po osiągnięciu napięcia będącego rożnym od docelowego o pewien ustalony próg zadziałania (np. -0.03V), poziom ustalony przed rozpoczęciem jest utrzymywany przez regulator PI. 
+    \item Po osiągnięciu napięcia będącego rożnym od docelowego o pewien ustalony próg zadziałania (np. -0.03 V), poziom ustalony przed rozpoczęciem jest utrzymywany przez regulator PI. 
     \item Po osiągnięciu wartości prądu poniżej progu końcowego lub wystąpieniu błędu, ładowanie jest wyłączane, a użytkownik powiadamiany o rezultacie.
 \end{enumerate}
 
 
 \chapter{Testy i weryfikacja}
 
-
 Ponieważ rezystancja wewnętrzna ogniwa ulega w procesie ciągłym zmianom, co więcej, szybkość tych zmian także nie jest stała, stąd jakość regulacji może być zdecydowanie polepszona użyciem takich technik jak np. gain scheduling.
 Mimo, że układ jest statyczny względem zadanego prądu, odpowiednio duże wzmocnienie regulatora PI zapewnia akceptowalne mały uchyb w całym czasie regulacji. 
-Wykorzystanie przetwornika A/C na ujemnym biegunie ogniwa nie pozwala na dokładne pomiary wartości prądu, ale daje podgląd dynamiki jego zmian. Przebieg napięć i prądów dla procesu przy wstępnych nastawach przedstawiono na rys. dla ładowania ogniwa o pojemności nominalnej 2700mAh prądem 1.9A do napięcia 4.0V kończąc ładowanie przy prądzie 1000mA.
+Wykorzystanie przetwornika A/C na ujemnym biegunie ogniwa nie pozwala na dokładne pomiary wartości prądu, ale daje podgląd dynamiki jego zmian. Przebieg napięć i prądów dla procesu przy wstępnych nastawach przedstawiono na rys. dla ładowania ogniwa o pojemności nominalnej 2700 mAh prądem 1.9 A do napięcia 4.0 V kończąc ładowanie przy prądzie 1000 mA.
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/bezkondensatorze.png}}
      \caption{Pierwszy test. \label{img:1strun}}
 \end{figure}
-W miarę zbliżania się do napięcia 4V, między 5. a 21. minutą, można zaobserwować narastające szumy na napięciu ogniwa. Są one mieszczą się one zazwyczaj w zakładanej tolerancji dla napięcia ładowania, ale ich szybkozmienny charakter sugeruje występowanie w układzie oscylacji. Jako że sygnał z przetwornika jest uśrednieniem 64 kolejnych pomiarów, oscylacje muszą być bardzo znaczące.
+W miarę zbliżania się do napięcia 4 V, między 5. a 21. minutą, można zaobserwować narastające szumy na napięciu ogniwa. Są one mieszczą się one zazwyczaj w zakładanej tolerancji dla napięcia ładowania, ale ich szybkozmienny charakter sugeruje występowanie w układzie oscylacji. Jako że sygnał z przetwornika jest uśrednieniem 64 kolejnych pomiarów, oscylacje muszą być bardzo znaczące.
 Najbardziej prawdopodobnym ich źródłem, jako, że objawiają się przede wszystkim wahaniami prądu, jest wadliwy projekt sprzężenia zwrotnego od rezystora pomiarowego do tranzystora. Za pomocą symulacji SPICE zweryfikowano zapas fazy układu dla zestawu parametrów, dla którego wystąpiły największe oscylacje.
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/bode_nocap.png}}
@@ -297,18 +326,13 @@ Po zastosowanych zmianach:
      \caption{Przebieg procesu ładowania. Widoczne uszkodzenie ogniwa. \label{img:PrettyChargeWithCellFailure}}
 \end{figure}
 
-\newpage
-\begin{figure}[hbtp]
-     \resizebox{\linewidth}{!}{\includegraphics{nazwa pliku grafiki}}
-     \caption{Podpis rysunku. \label{img:!_some_label}}
-\end{figure}
+\chapter{Uwagi końcowe}
+Cele postawione w projekcie zostały z sukcesem zrealizowane. Urządzenie jest w stanie regulować prąd i napięcie ładowania, realizując założone strategie ładowania z przewidzianą dokładnością. Proces realizacji urządzenia ujawnił wiele błędów etapu projektowego, które jednak udało się naprawić bez wpływu na skuteczność działania ładowarki. Wykorzystanie wstępnie uruchomionego urządzenia pozwoliło na zebranie danych potrzebnych do określenia modelu, pozwalającego na dalsza poprawę działania. Skuteczność funkcjonowania udowadnia stosowny wykres zapisanego przebiegu procesu.
 
-Równania powinny być numerowane jak równanie \ref{entropy}.
-\begin{equation}
-H(X) = -\sum_{i=0}^n P(x_i) \log_2 P(x_i).\label{entropy}
-\end{equation}
+Zaprojektowane urządzenia z powodzeniem jest wykorzystywane przez autora na co dzień, demonstrując zaskakującą żywotność w warunkach eksploatacji na granicy możliwości.
 
-\bibliographystyle{plain} 
+
+\bibliographystyle{unsrt} 
 \bibliography{bibiking}
 
 \end{document}
