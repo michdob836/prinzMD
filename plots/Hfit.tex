@@ -4,8 +4,8 @@
                 grid style={dotted,gray},
                 width=\textwidth,
                 height=0.3\textheight,
-                ylabel={$\mathrm{V_c}$ \[V\]},
-                xlabel={czas, \[min\]},
+                ylabel={Napięcie na ogniwie, [V]},
+                xlabel={Wartość rejestru przetwornika A/C, \[-\]},
                 legend cell align=left,
                 legend pos = north west,
                 axis lines = left, 
@@ -13,13 +13,20 @@
         	]
     
     \addplot[ 
-            x filter/.code={\pgfmathparse{#1/60}\pgfmathresult},
-                mark=none,
+                only marks,
+                mark=+,
                 mark size=5,
                 red!60!black,
-		 	] 	table [x=time, y=Vcell] {data/charging_20200113_18-05-38_cell_failure.tsv};
+		 	] 	table [x=Reg, y=Vm] {data/Hfit.txt};
     \addlegendentry{Pomiary}
+    
+     \addplot [ 	no markers, 
+    		   	thick, 
+              	red!70!white,
+              	domain=4e+4:6.5e+4,
+              	samples=100,
+             ] {x*7.433e-05 + 0.0894};
+	\addlegendentry{Dopasowane prosta}
 
-
-\end{axis}
+    \end{axis}
 \end{tikzpicture}
