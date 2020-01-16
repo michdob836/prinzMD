@@ -9,6 +9,7 @@
 \usepackage{gensymb}
 \usepackage{pstricks}
 \usepackage{hyperref}
+\usepackage{pgfplots}
 
 %% thesis author
 \author{Michał Dobrut}
@@ -294,22 +295,20 @@ Skrypt ładujący CC-CV działa następująco:
 
 \chapter{Testy i weryfikacja}
 
-Ponieważ rezystancja wewnętrzna ogniwa ulega w procesie ciągłym zmianom, co więcej, szybkość tych zmian także nie jest stała, stąd jakość regulacji może być zdecydowanie polepszona użyciem takich technik jak np. gain scheduling.
-Mimo, że układ jest statyczny względem zadanego prądu, odpowiednio duże wzmocnienie regulatora PI zapewnia akceptowalne mały uchyb w całym czasie regulacji. 
-Wykorzystanie przetwornika A/C na ujemnym biegunie ogniwa nie pozwala na dokładne pomiary wartości prądu, ale daje podgląd dynamiki jego zmian. Przebieg napięć i prądów dla procesu przy wstępnych nastawach przedstawiono na rys. dla ładowania ogniwa o pojemności nominalnej 2700 mAh prądem 1.9 A do napięcia 4.0 V kończąc ładowanie przy prądzie 1000 mA.
+Wykorzystanie przetwornika A/C na ujemnym biegunie ogniwa nie pozwala na dokładne pomiary wartości prądu, ale daje podgląd dynamiki jego zmian. Przebieg napięć i prądów dla procesu przy wstępnych nastawach przedstawiono na rys. \ref{img:1strun} dla ładowania ogniwa o pojemności nominalnej 2700 mAh prądem 1.9 A do napięcia 4.0 V kończąc ładowanie przy prądzie 1000 mA. 
 \begin{figure}[hbtp]
-     \resizebox{\linewidth}{!}{\includegraphics[]{img/bezkondensatorze.png}}
-     \caption{Pierwszy test. \label{img:1strun}}
+     \resizebox{\linewidth}{!}{\includegraphics[]{img/faktycznie_oscyluje.png}}
+     \caption{Pierwsze uruchomienie: niepożądane oscylacje \label{img:1strun}}
 \end{figure}
-W miarę zbliżania się do napięcia 4 V, między 5. a 21. minutą, można zaobserwować narastające szumy na napięciu ogniwa. Są one mieszczą się one zazwyczaj w zakładanej tolerancji dla napięcia ładowania, ale ich szybkozmienny charakter sugeruje występowanie w układzie oscylacji. Jako że sygnał z przetwornika jest uśrednieniem 64 kolejnych pomiarów, oscylacje muszą być bardzo znaczące.
+W miarę wzrostu napięcia, zaobserwowano narastające szumy: w układzie występują oscylacje. Jako że sygnał z przetwornika jest uśrednieniem 64 kolejnych pomiarów, oscylacje muszą być bardzo znaczące.
 Najbardziej prawdopodobnym ich źródłem, jako, że objawiają się przede wszystkim wahaniami prądu, jest wadliwy projekt sprzężenia zwrotnego od rezystora pomiarowego do tranzystora. Za pomocą symulacji SPICE zweryfikowano zapas fazy układu dla zestawu parametrów, dla którego wystąpiły największe oscylacje.
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/bode_nocap.png}}
-     \caption{Analiza małosygnałowa dla układu oscylującego: wykres Bodego \label{img:1strun}}
+     \caption{Analiza częstotliwościowa dla układu oscylującego. \label{img:bode_nocap}}
 \end{figure}
-W rezultacie stwierdzono, że zapas fazy wynosi około 10\degree. Teoretycznie układ powinien być stabilny dla każdego zapasu fazy > 0\degree, ale w praktyce wiele nieprzewidzianych czynników może doprowadzić do jego obniżenia, na przykład pojemność ścieżki pomiędzy wzmacniaczem a bramką tranzystora (która sama w sobie tworzy kondensator). W praktyce przyjmuje się że zapas fazy powinien wynosić 45\degree \cite{PhaseMargin_TERRELL1996383}.
+W rezultacie stwierdzono, że zapas fazy wynosi około 10\degree. Teoretycznie układ powinien być stabilny dla każdego zapasu fazy > 0\degree, ale w praktyce wiele nieprzewidzianych czynników może doprowadzić do jego obniżenia, na przykład pojemność ścieżki pomiędzy wzmacniaczem a bramką tranzystora (która sama w sobie tworzy kondensator). W praktyce przyjmuje się że zapas fazy powinien wynosić 60\degree \cite{PhaseMargin_TERRELL1996383}.
 
-Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano kondensator pomiędzy wejście odwracające a wyjście wzmacniacza (rys. \ref{img:HereYouAreMrCap}), co zwiększyło zapas fazy do 45\degree (rys. \ref{img:MrBodeWithCap}).
+Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano kondensator pomiędzy wejście odwracające a wyjście wzmacniacza (rys. \ref{img:HereYouAreMrCap}), co zwiększyło zapas fazy do 87\degree (rys. \ref{img:MrBodeWithCap}).
 \begin{figure}[hbtp]
     \centering
      \resizebox{0.7\linewidth}{!}{\includegraphics[]{img/how_cap_was_added.png}}
@@ -322,9 +321,11 @@ Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano konden
 
 Po zastosowanych zmianach:
 \begin{figure}[hbtp]
-     \resizebox{\linewidth}{!}{\includegraphics{img/prettyChargingAaaaandFailure.png}}
+    \input{plots/charging.tex}
      \caption{Przebieg procesu ładowania. Widoczne uszkodzenie ogniwa. \label{img:PrettyChargeWithCellFailure}}
 \end{figure}
+Ponieważ rezystancja wewnętrzna ogniwa ulega w procesie ciągłym zmianom, co więcej, szybkość tych zmian także nie jest stała, stąd jakość regulacji może być zdecydowanie polepszona użyciem takich technik jak np. gain scheduling.
+Mimo, że układ jest statyczny względem zadanego prądu, odpowiednio duże wzmocnienie regulatora PI zapewnia akceptowalne mały uchyb w całym czasie regulacji. 
 
 \chapter{Uwagi końcowe}
 Cele postawione w projekcie zostały z sukcesem zrealizowane. Urządzenie jest w stanie regulować prąd i napięcie ładowania, realizując założone strategie ładowania z przewidzianą dokładnością. Proces realizacji urządzenia ujawnił wiele błędów etapu projektowego, które jednak udało się naprawić bez wpływu na skuteczność działania ładowarki. Wykorzystanie wstępnie uruchomionego urządzenia pozwoliło na zebranie danych potrzebnych do określenia modelu, pozwalającego na dalsza poprawę działania. Skuteczność funkcjonowania udowadnia stosowny wykres zapisanego przebiegu procesu.
@@ -332,7 +333,7 @@ Cele postawione w projekcie zostały z sukcesem zrealizowane. Urządzenie jest w
 Zaprojektowane urządzenia z powodzeniem jest wykorzystywane przez autora na co dzień, demonstrując zaskakującą żywotność w warunkach eksploatacji na granicy możliwości.
 
 
-\bibliographystyle{unsrt} 
+\bibliographystyle{plain} 
 \bibliography{bibiking}
 
 \end{document}
