@@ -1,0 +1,35 @@
+\begin{tikzpicture}
+    \begin{axis}[
+   				%xmode=log,
+                %ymode=log,
+                grid=both,
+                grid style={dotted,gray},
+                width=\textwidth,
+                height=0.3\textheight,
+                ylabel={$\mathrm{V_c}$ \[V\]},
+                xlabel={czas, \[s\]},
+                legend cell align=left,
+                legend pos = north west,
+               % minor tick num=3,
+                axis lines = left, 
+                legend columns=1, 
+                %   every axis x label/.style={
+                %   at={(ticklabel* cs:0.975)},
+                % anchor=north ,},
+                % every axis y label/.style={
+                %   at={(ticklabel* cs:1.0)},
+                %   anchor=south,},
+                %   ymin = 0,
+        	]
+    
+    \addplot[ 
+            x filter/.code={\pgfmathparse{#1/60}\pgfmathresult},
+                mark=none,
+                mark size=5,
+                red!60!black,
+		 	] 	table [x=time, y=Vcell] {data/charging_20200113_18-05-38_cell_failure.tsv};
+    \addlegendentry{Pomiary}
+
+
+\end{axis}
+\end{tikzpicture}
