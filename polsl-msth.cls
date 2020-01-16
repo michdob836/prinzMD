@@ -15,7 +15,7 @@
 %% 
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
 \ProvidesClass{polsl-msth}
-    [2018/01/12 v0.0.1-statement Silesian University of Technology, Ms thesis class]
+    [2018/11/19 v0.0.2-statement Silesian University of Technology, Ms thesis class]
 \LoadClass[a4paper,twoside,openright,12pt]{book}
 \linespread{1.3}
 \RequirePackage{babel}
@@ -187,7 +187,7 @@ udost\k{e}pnienie mojej pracy dyplomowej/rozprawy doktorskiej*
 podpisu przez Dziekanat)\hfill}\\
 
 \vspace{1.5cm}
-\noindent * w³a¶ciwe podkre¶liæ
+\noindent * w\l a\'sciwe podkre\'sli\'c
 \vfill%
 }
 \renewcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
@@ -196,7 +196,7 @@ podpisu przez Dziekanat)\hfill}\\
                     \@afterindentfalse
                     \secdef\@chapter\@schapter}
 %% 
-%% Copyright (C) 2017 by Silesian University of Technology.
+%% Copyright (C) 2017, 2018 by Silesian University of Technology.
 %% Copyright (C) 2010, 2014 by Krzysztof Mazur <krzysiek@podlesie.net>
 %% Fragments from book class by The LaTeX3 Project.
 %% 
