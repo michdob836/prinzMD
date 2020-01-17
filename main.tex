@@ -94,8 +94,10 @@ Powstało wiele dokładnych modeli\cite{1634598_BATT_MODELS} ogniw litowo-jonowy
      \caption{Model elektryczny ogniwa.\label{img:thevenin_model}}
 \end{figure}
 
-\remark{tutaj trochę czegoś nie rozumiem, podaje Pan wcześniej model ogniwa,
-a później pisze Pan o tym, że obserwacja kształtu odpowiedzi skokowej pozwoliła na stwierdzenie struktury transmitacji. I też ta transmitacja nie pasuje do tego modelu powyżej.}
+Transmitancja operatorowa tego modelu wynosi:
+\begin{equation}
+    K(s) = \frac{U(s)}{I(s)} = (R_s + R_p)\frac{\frac{R_s R_p C_p s +1}{R_s + R_p}s+1}{R_p C_p s +1} + Vcell
+\end{equation}
 
 \section{Regulator}
 Aby realizować wybraną strategię, konieczne jest użycie struktury regulatora zapewniającej stabilne działanie nawet przy pewnej zmienności parametrów obiektu, wynikającej z różnic technologicznych pomiędzy ogniwami. Wymagania te spełnia, przy jednoczesnym zachowaniu łatwości implementacji, regulator PI.
@@ -103,13 +105,14 @@ Aby realizować wybraną strategię, konieczne jest użycie struktury regulatora
      u(t)=k_{p}\left[e(t)+{\frac {1}{T_{i}}}\int _{0}^{t}e(\tau )d\tau \right]
      \label{eq:PI_timebased}
 \end{equation}
-Ze względu na częstotliwość próbkowania znacznie większa od stałych czasowych procesu wykorzystano możliwość analizy regulatora jako układu ciągłego.\remark{to niestety nie jest do końca prawdą, choć znam pewnie źródło, pewna osoba, która może tego do końca nie rozumie. Jak ma Pan skrypt prof. Gessinga to dobrze sobie tam o tym poczytać.}
 
+Wykorzystano możliwość analizy regulatora jako układu ciągłego po uwzględnieniu próbkowania jako opóźnienia w obiekcie. Okres próbkowania $h=0.25$~s jest 120 razy mniejszy od najmniejszej stałej czasowej. Do doboru nastaw użyto modelu \ref{eq:model_z_opozn} i narzędzi MATLABa aby uzyskać zapas fazy > 60\degree i zapas amplitudy > 8 dB. 
+\begin{equation}
+    K(s)= (R_s + R_p)\frac{\frac{R_s R_p C_p s +1}{R_s + R_p}s+1}{R_p C_p s +1}*e^{-\frac{h}{2}s}
+    \label{eq:model_z_opozn}
+\end{equation}
 Zadana wartość napięcia jest utrzymywana przez regulator, podczas gdy ograniczenie prądowe ładowania jest realizowane przez ograniczenie wartości wyjściowej. Aby uniknąć zjawiska wind-up, błąd podawany na część całkową jest zerowany przy oparciu się o ograniczenie.
 
-\remark{a to mnie trochę zdziwiło, ja spodziewałem się prostego układu kaskadowego,
-gdzie regulator napięcia ma po prostu stała wartość zadaną przy ładowaniu
-CC-CV, i przez część CC to po prostu działa na ograniczeniu sterowania.}
 
 \chapter{Projekt urządzenia}
 \section{Założenia}
@@ -256,7 +259,7 @@ Producent zaleca podłączenie kondensatora chroniącego przed zakłóceniami po
 
 Podczas montażu diód sygnalizacyjnych okazało się, że użyty footprint jest przeznaczony dla elementu ze wspólną katodą, a zakupiony komponent miał niezależne katody, położone na innych pinach. Obrócenie i włączanie zwieraniem do masy zamiast do zasilania umożliwiło zachowanie PCB.
 
-Podczas weryfikacji działania przetworników stwierdzono, że układ C/A działa jak zakładano, a układ A/C zaniża mierzone napięcie o około 0.5V. Błąd ten był stały w mierzonych przedziałach, więc odpowiednia kalibracja, przeprowadzona w późniejszych etapach pozwoliła go wyeliminować.\remark{0.5V? dobrze by było ustalić dlaczego. C/A na obu wejściach ma te kondensatory 100nF? Napięcie referencyjne jest na pewno właściwe?}
+Podczas weryfikacji działania przetworników stwierdzono, że układ C/A działa jak zakładano, a układ A/C zaniża mierzone napięcie o około 0.5V. Błąd ten był stały w mierzonych przedziałach, więc odpowiednia kalibracja, przeprowadzona w późniejszych etapach pozwoliła go wyeliminować.
 
 Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2 ścieżek i dodanie 3 rezystorów 0~$\Omega$ pozwoliło w czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
 
