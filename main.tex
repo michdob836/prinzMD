@@ -249,26 +249,26 @@ Płytka drukowana została wykonana metodą termotransferu. Z powodu braku solde
     \item Kalibracja przetwornika A/C.
     \item Montaż uchwytu ogniwa i testy na ogniwie.
 \end{enumerate}
-Po wytrawieniu w skutek defektu warstwy zabezpieczającej ścieżka doprowadzająca sygnał z dodatniego bieguna ogniwa została rozpuszczona powodując przerwę około 1mm, co zostało naprawione mostkiem z drutu.
+Podczas wykonywania PCB w skutek defektu warstwy zabezpieczającej ścieżka doprowadzająca sygnał z dodatniego bieguna ogniwa została podtrawiona powodując przerwę około 1mm, co zostało naprawione mostkiem z drutu.
 
-Nowa seria mikrokontrolerów ATtiny (produkowana przez Microchip po przejęciu Atmel), do której należy wybrana jednostka, aby zwiększyć liczbę możliwych do wykorzystania pinów, jest programowana przez interfejs UPDI, który pozwala na komunikację half-duplex po jednym linii, pomijając połączenie masy. Aby nie kupować drogiego programatora producenta, wykorzystano rozwiązanie pozwalające na programowanie z użyciem zwykłego adaptera USB-TTL i rezystora\cite{pyupdi}.
+Nowa seria mikrokontrolerów ATtiny (produkowana przez Microchip po przejęciu Atmel), do której należy wybrana jednostka, aby zwiększyć liczbę możliwych do wykorzystania pinów, jest programowana przez interfejs UPDI, który pozwala na komunikację half-duplex po jednym linii, pomijając połączenie masy. Ze względu na fakt, że sygnały są identyczne jak w standardzie UART, wykorzystano rozwiązanie pozwalające na programowanie z użyciem zwykłego adaptera USB-TTL i rezystora\cite{pyupdi}.
 \begin{figure}[hbtp]
 \centering
      \resizebox{0.8\linewidth}{!}{\includegraphics[]{img/pyupdi.png}}
      \caption{Podłączenie programatora, wykorzystano grafikę z \cite{pyupdi}\label{img:pyupdi}}
 \end{figure}
-Producent zaleca podłączenie kondensatora chroniącego przed zakłóceniami pomiędzy pin resetu a masę, jednocześnie ostrzegając, że dla niektórych innych interfejsów może uniemożliwić to ich funkcjonowanie\cite{avr_hardware}. Jak sprawdzono, konieczne było wylutowanie kondensatora także w przypadku UPDI.
+
+Producent zaleca podłączenie kondensatora chroniącego przed zakłóceniami pomiędzy pin resetu a masę, jednocześnie ostrzegając, że dla niektórych innych interfejsów komunikacyjnych może uniemożliwić to ich funkcjonowanie\cite{avr_hardware}. Jak sprawdzono, konieczne było usunięcie kondensatora także w przypadku UPDI.
 
 Podczas montażu diód sygnalizacyjnych okazało się, że użyty footprint jest przeznaczony dla elementu ze wspólną katodą, a zakupiony komponent miał niezależne katody, położone na innych pinach. Obrócenie i włączanie zwieraniem do masy zamiast do zasilania umożliwiło zachowanie PCB.
 
 Podczas weryfikacji działania przetworników stwierdzono, że układ C/A działa jak zakładano, a układ A/C zaniża mierzone napięcie o około 0.5V. Błąd ten był stały w mierzonych przedziałach, więc odpowiednia kalibracja, przeprowadzona w późniejszych etapach pozwoliła go wyeliminować.
 
-Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2 ścieżek i dodanie 3 rezystorów 0~$\Omega$ pozwoliło w czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
+Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2 ścieżek i dodanie 3 rezystorów 0~$\Omega$ pozwoliło w stosunkowo czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
 
-Po zamontowaniu tranzystora stwierdzono, że w skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w większości zastosowań), a co za tym idzie, dren ze źródłem był odwrócony. Po wykryciu, że powodem przepływu prądu i pewnego spadku napięcia jest wewnętrzna dioda, i odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Wykorzystano zakupiony radiator z blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degree \,C/W}$ przy naturalnej konwekcji. 
+Po zamontowaniu tranzystora stwierdzono, że w skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w większości zastosowań), a co za tym idzie, dren ze źródłem był zamieniony. Po wykryciu, że powodem przepływu prądu oraz pewnego spadku napięcia jest wewnętrzna dioda, a następnie odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Ze względu na brak możliwości realizacji radiatora zgodnie z projektem, wykorzystano radiator z blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degreeC/W}$ przy naturalnej konwekcji. 
 
 Ponieważ podanie zbyt dużego napięcia na ogniwo lub zwarcie biegunów może prowadzić do zniszczenia ogniwa a nawet zapalenia się, aby bezpiecznie sprawdzić działanie układu wykonano obciążenie testowe z diód o odpowiedniej mocy, którego schemat przedstawiono na rys. \ref{img:testload}. Urządzenie to pozwala także na bezpieczne rozładowanie ogniw do około 2.5~V.
-Aby ułatwić testy, zgodnie z metodą 'hardware-in-the-loop', cały proces nadzoruje skrypt w środowisku MATLAB, a mikroprocesor zajmuje się wymianą danych między peryferiami a komputerem.
 \begin{figure}[hbtp]
     \centering
     \resizebox{0.5\linewidth}{!}{\includegraphics[]{img/testload.png}}
@@ -281,6 +281,8 @@ Wykorzystując fakt, że napięcie przewodzenia diód zmienia się w zależnośc
      \caption{Kalibracja przetwornika A/C: dodatni biegun ogniwa. \label{img:ADCfitting}}
 \end{figure}
 Dzięki temu odwzorowano pomiary woltomierzem z dokładnością do 0.01~V.
+
+Aby ułatwić testy, zgodnie z metodą 'hardware-in-the-loop', cały proces nadzoruje skrypt w środowisku MATLAB, a mikroprocesor zajmuje się wymianą danych między peryferiami a komputerem.
 
 Testy wykonane na docelowych ogniwach przebiegły pomyślnie. Ze względu na dużą rezystancje wewnętrzną głęboko rozładowanych ogniw, moc wydzielana na tranzystorze nigdy nie osiąga zakładanej wartości. Temperatura na tranzystorze nie przekracza maksymalnie dopuszczalnej.
 

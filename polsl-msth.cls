@@ -124,9 +124,9 @@ Sierpie\'n\or Wrzesie\'n\or Pa\'zdziernik\or Listopad\or Grudzie\'n\fi
 \let\footnote\thanks%
 \vbox to 22.910474truecm{% 24 cm minus header
 \vbox to 17.910474truecm{% 19 cm minus header
-\vbox to 32mm{
+\vbox to 17mm{
 \vfill%
-\centerline{\includegraphics[width=29mm]{pi}}
+\centerline{\includegraphics[height=10mm]{pi}}
 }
 \vspace{1cm}
 \begin{center}
