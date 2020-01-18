@@ -37,79 +37,79 @@
 
 \chapter{Wprowadzenie}
 
-Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii dla urządzeń przenośnych oraz pojazdów elektrycznych i~hybrydowych. W związku z tym od 20 lat można obserwować intensywne badania mające na celu poprawę parametrów ogniw i testowanie nowych technologii. Spadająca cena i poprawa właściwości powoduje wzrost zapotrzebowania, zwłaszcza za sprawą popularyzacji samochodów osobowych z napędem elektrycznym (EV). Branża automotive stawia bardzo wysokie wymagania dla akumulatorów samochodów EV: wymagana jest duża gęstość energetyczna, wysoka szybkość ładowania i ponadprzeciętna trwałość. Wciąż badane są nowe strategie ładowania które pozwalają zachować wysokie parametry przy minimalizacji czasu ładowania.
+Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii dla urządzeń przenośnych oraz pojazdów elektrycznych i~hybrydowych. W~związku z~tym od 20 lat można obserwować intensywne badania mające na celu poprawę parametrów ogniw i~testowanie nowych technologii. Spadająca cena i~poprawa właściwości powoduje wzrost zapotrzebowania, zwłaszcza za sprawą popularyzacji samochodów osobowych z~napędem elektrycznym (EV). Branża automotive stawia bardzo wysokie wymagania dla akumulatorów samochodów EV: wymagana jest duża gęstość energetyczna, wysoka szybkość ładowania i~ponadprzeciętna trwałość. Wciąż badane są nowe strategie ładowania które pozwalają zachować wysokie parametry przy minimalizacji czasu ładowania.
 
-Niniejszy projekt inżynierski wpisuje się w ten trend, proponując ładowarkę pozwalającą z dużą elastycznością kształtować przebieg procesu ładowania. Urządzenie to ma umożliwiać przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z uwagi na dominującą pozycję na rynku ogniw w standardzie 18650, taki rozmiar został wybrany za docelowy. Dodatkowo, ze względu na popularyzację przenośnych źródeł światła, wykorzystujących ten rozmiar, ładowarka ma służyć autorowi do codziennego użytku, także zakładając przyszły wzrost pojemności baterii.
+Niniejszy projekt inżynierski wpisuje się w~ten trend, proponując ładowarkę pozwalającą z~dużą elastycznością kształtować przebieg procesu ładowania. Urządzenie to ma umożliwiać przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z~uwagi na dominującą pozycję na rynku ogniw w~standardzie 18650, taki rozmiar został wybrany za docelowy. Dodatkowo, ze względu na popularyzację przenośnych źródeł światła, wykorzystujących ten rozmiar, ładowarka ma służyć autorowi do codziennego użytku, także zakładając przyszły wzrost pojemności baterii.
 
-W projekcie położony jest nacisk na stworzenie regulatora, pozwalającego realizować założone przebiegi napięcia i prądu na ogniwie. Istotna dla zachowania dobrej kondycji ogniwa jest stabilne utrzymywanie zadanych parametrów pracy. Zadanie nastawiania prądu jest zrealizowane za pomocą tranzystora MOSFET, pracującego w zakresie triodowym, którego otwieraniem steruje wzmacniacz operacyjny, tworząc źródło prądowe. Nad napięciem na ogniwie czuwa regulator PI, który w układzie kaskadowym tak steruje prądem, aby utrzymać napięcie z wymaganą precyzją. Nad całością operacji kontrolę sprawuje skrypt w środowisku MATLAB, który odpowiada za wypracowywanie sygnału sterującego prądem oraz gromadzenie i wyświetlanie danych z procesu.
+W~projekcie położony jest nacisk na stworzenie regulatora, pozwalającego realizować założone przebiegi napięcia i~prądu na ogniwie. Istotna dla zachowania dobrej kondycji ogniwa jest stabilne utrzymywanie zadanych parametrów pracy. Zadanie nastawiania prądu jest zrealizowane za pomocą tranzystora MOSFET, pracującego w~zakresie triodowym, którego otwieraniem steruje wzmacniacz operacyjny, tworząc źródło prądowe. Nad napięciem na ogniwie czuwa regulator PI, który w~układzie kaskadowym tak steruje prądem, aby utrzymać napięcie z~wymaganą precyzją. Nad całością operacji kontrolę sprawuje skrypt w~środowisku MATLAB, który odpowiada za wypracowywanie sygnału sterującego prądem oraz gromadzenie i~wyświetlanie danych z~procesu.
 
 
 \chapter{Teoria}
-\section{Budowa i specyfika działania ogniw litowo-jonowych}
-Historia użytecznych ogniw na bazie litu sięga lat 70, kiedy Adam Heller opatentował pierwszą kompozycję chemiczną anody, katody i elektrolitu \cite{heller1975electrochemical}, pozwalającą na skonstruowanie baterii w cenach akceptowalnych przez rynek. Od tego czasu dostępnych jest wiele technologii wykonania takich ogniw, różniących się ze względu na wykorzystane materiały. Ogólną zasadę działania ogniw na przykładzie jednej z technologii przedstawia rys. \ref{img:liion_structure}.
+\section{Budowa i~specyfika działania ogniw litowo-jonowych}
+Historia użytecznych ogniw na bazie litu sięga lat 70, kiedy Adam Heller opatentował pierwszą kompozycję chemiczną anody, katody i~elektrolitu \cite{heller1975electrochemical}, pozwalającą na skonstruowanie baterii w~cenach akceptowalnych przez rynek. Od tego czasu dostępnych jest wiele technologii wykonania takich ogniw, różniących się ze względu na wykorzystane materiały. Ogólną zasadę działania ogniw na przykładzie jednej z~technologii przedstawia rys. \ref{img:liion_structure}.
 \begin{figure}[hbtp]
 \centering
      \resizebox{0.45\linewidth}{!}{\includegraphics[]{img/liion_structure.png}}
-     \caption{Budowa i działanie ogniwa z anodą grafitową i katodą LCO. \cite{liionpic_wikimedia}  \label{img:liion_structure}}
+     \caption{Budowa i~działanie ogniwa z~anodą grafitową i~katodą LCO. \cite{liionpic_wikimedia}  \label{img:liion_structure}}
 \end{figure}
-Na tle innych technologii akumulatory litowo-jonowe przodują zarówno pod wpływem wagowej gęstości energetycznej jak i wagowej gęstości mocy. Jest to spowodowane niską masą atomową litu i łatwością wnikania (interkalacji) dużej liczby (z natury małych) jonów w grafit, materiał prosty i tani w produkcji. Lit posiada jeden z najwyższych potencjałów standardowych półogniwa, co powoduje, że baterie z wykonane z jego użyciem będą miały wyższe napięcie niż przy użyciu innych metali. Dodatkowo, w naturze pierwiastek ten występuje dość powszechnie, dlatego rozwój technologii nie jest zagrożony brakami surowcowymi. Głównymi wadami są jednak wysoka reaktywność litu, stawiająca wyzwania w kwestii zapewnienia bezpieczeństwa użytkowania oraz niska trwałość w warunkach powtarzającego się wykorzystywania pełnej pojemności\cite{IBRAHIM20081221}. Ograniczona trwałość i wciąż znaczna cena jest powodem, dla którego ogniwa te znalazły zastosowanie głównie w urządzeniach przenośnych i pojazdach oraz systemach awaryjnego zasilania, a w mniejszym stopniu do wyrównywania mocy dostarczanej do sieci elektrycznej.
+Na tle innych technologii akumulatory litowo-jonowe przodują zarówno pod wpływem wagowej gęstości energetycznej jak i~wagowej gęstości mocy. Jest to spowodowane niską masą atomową litu i~łatwością wnikania (interkalacji) dużej liczby (z natury małych) jonów w~grafit, materiał prosty i~tani w~produkcji. Lit posiada jeden z~najwyższych potencjałów standardowych półogniwa, co powoduje, że baterie z~wykonane z~jego użyciem będą miały wyższe napięcie niż przy użyciu innych metali. Dodatkowo, w~naturze pierwiastek ten występuje dość powszechnie, dlatego rozwój technologii nie jest zagrożony brakami surowcowymi. Głównymi wadami są jednak wysoka reaktywność litu, stawiająca wyzwania w~kwestii zapewnienia bezpieczeństwa użytkowania oraz niska trwałość w~warunkach powtarzającego się wykorzystywania pełnej pojemności\cite{IBRAHIM20081221}. Ograniczona trwałość i~wciąż znaczna cena jest powodem, dla którego ogniwa te znalazły zastosowanie głównie w~urządzeniach przenośnych i~pojazdach oraz systemach awaryjnego zasilania, a~w mniejszym stopniu do wyrównywania mocy dostarczanej do sieci elektrycznej.
 
 \section{Porównanie chemii}
-Obecnie dominującą rolę przejęły ogniwa oparte o katodę niklowo-manganowo-kobaltową NMC (w różnych proporcjach składników, dąży się do wyeliminowania lub zmniejszenia udziału drogiego kobaltu) oraz niklowo-kobaltowo-aluminiową NCA\cite{bu_liiontypes}. W zastosowaniach wymagających dużego bezpieczeństwa i długiej żywotności używa się także katod z fosforanu litowo-żelazowego LFP lub anod z tytanku litu LTO. Pozostałe technologie wychodzą z użytku, są bardzo drogie lub na razie mają wąski zakres zastosowań. W tabeli \ref{tab:chemisties_voltages} zebrano parametry interesujące ze względu na konstrukcję ładowarki.
+Obecnie dominującą rolę przejęły ogniwa oparte o~katodę niklowo-manganowo-kobaltową NMC (w różnych proporcjach składników, dąży się do wyeliminowania lub zmniejszenia udziału drogiego kobaltu) oraz niklowo-kobaltowo-aluminiową NCA\cite{bu_liiontypes}. W~zastosowaniach wymagających dużego bezpieczeństwa i~długiej żywotności używa się także katod z~fosforanu litowo-żelazowego LFP lub anod z~tytanku litu LTO. Pozostałe technologie wychodzą z~użytku, są bardzo drogie lub na razie mają wąski zakres zastosowań. W~tabeli \ref{tab:chemisties_voltages} zebrano parametry interesujące ze względu na konstrukcję ładowarki.
 \begin{table}[hbtp]
 \caption{Wybrane parametry zależne od technologii ogniwa.\cite{bu_liiontypes} \label{tab:chemisties_voltages}}
 \centerline{\begin{tabular}{|c|c|c|c|c|}
 \hline
-Technologia & Napięcie maks., V & Napięcie min., V & Szybkość ład., C & Żywotność, cykle \\
+Technologia & Napięcie maks., V~& Napięcie min., V~& Szybkość ład., C~& Żywotność, cykle \\
 \hline
 LCO & 4.2 & 2.5 & 0.7-{}-1 & 500-{}-1000\\
 \hline
 LMO & 4.2 & 2.5 & 0.7-{}-1 & 300-{}-700\\
 \hline 
 NMC & 4.2 & 2.5 & 0.7-{}-1 & 1000-{}-2000\\ \hline
-LFP & 3.65 & 2.5 & 1 & 2000+\\ \hline
+LFP & 3.65 & 2.5 & 1~& 2000+\\ \hline
 NCA & 4.2 & 3.0 & 0.7 & 500\\ \hline
-LTO & 2.85 & 1.8 & 1 & 3000-{}-7000\\ \hline
+LTO & 2.85 & 1.8 & 1~& 3000-{}-7000\\ \hline
 \end{tabular}}
 \end{table}
 
-Ładowarka była projektowana dla najpopularniejszych ogniw na rynku, jednak dzięki odpowiednio dobranym komponentom jest w stanie działać także dla ogniw w technologii LTO, z ograniczeniem prądu ładowania.
+Ładowarka była projektowana dla najpopularniejszych ogniw na rynku, jednak dzięki odpowiednio dobranym komponentom jest w~stanie działać także dla ogniw w~technologii LTO, z~ograniczeniem prądu ładowania.
 
 \section{Strategie ładowania}
-Ogniwa litowo jonowe, w większości przypadków optymalizowane aby osiągnąć maksymalną gęstość energetyczną, wykazują dużą wrażliwość na przekroczenie ograniczeń prądowych ładowania\cite{TOMASZEWSKA2019100011}, które w dobie rozwoju samochodów elektrycznych są czynnikiem mocno ograniczającym szeroką popularyzację. W związku z tym, badane są rozmaite strategie ładowania. Odpowiedni dobór profilu prądowego pozwala na podwojenie żywotności baterii w stosunku do ładowania profilem CC-CV, przy czasie ładowania dłuższym o około 15\%\cite{SCHINDLER2018364}.
+Ogniwa litowo jonowe, w~większości przypadków optymalizowane aby osiągnąć maksymalną gęstość energetyczną, wykazują dużą wrażliwość na przekroczenie ograniczeń prądowych ładowania\cite{TOMASZEWSKA2019100011}, które w~dobie rozwoju samochodów elektrycznych są czynnikiem mocno ograniczającym szeroką popularyzację. W~związku z~tym, badane są rozmaite strategie ładowania. Odpowiedni dobór profilu prądowego pozwala na podwojenie żywotności baterii w~stosunku do ładowania profilem CC-CV, przy czasie ładowania dłuższym o~około 15\%\cite{SCHINDLER2018364}.
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/protocols.jpg}}
      \caption{Różne strategie ładowania \cite{TOMASZEWSKA2019100011}.\label{img:charging_protocols}}
 \end{figure}
 
-Najbardziej rozpowszechnionym i rekomendowanym przez producentów schematem ładowania jest CC-CV, czyli utrzymywanie stałego prądu do momentu osiągnięcia zadanego napięcia maksymalnego, potem utrzymywanie tego napięcia, aż prąd spadnie poniżej zadanej wartości.
+Najbardziej rozpowszechnionym i~rekomendowanym przez producentów schematem ładowania jest CC-CV, czyli utrzymywanie stałego prądu do momentu osiągnięcia zadanego napięcia maksymalnego, potem utrzymywanie tego napięcia, aż prąd spadnie poniżej zadanej wartości.
 
-Jeżeli zaimplementowane zostaną metody programowej kontroli tych parametrów, możliwe jest także wykorzystanie dowolnego innego protokołu, tak długo jak jego wymagania prądowe i napięciowe mogą być spełnione przez ładowarkę.
+Jeżeli zaimplementowane zostaną metody programowej kontroli tych parametrów, możliwe jest także wykorzystanie dowolnego innego protokołu, tak długo jak jego wymagania prądowe i~napięciowe mogą być spełnione przez ładowarkę.
 
 \section{Model matematyczny ogniwa}
-Powstało wiele dokładnych modeli\cite{1634598_BATT_MODELS} ogniw litowo-jonowych, opisujących stan naładowania i odpowiedzi czasowe z dokładnością poniżej 1\%, jednak na potrzeby weryfikacji jakości regulacji prądu na poziomie sprzętowym, ze względu na małą dynamikę zmian, użyty został zastępczy model elektryczny 1. rzędu o parametrach jak w \cite{8759769_cellmodel1storder} (rys. \ref{img:thevenin_model}). Dzięki niemu możliwe było prowadzenie symulacji zachowania się układu w LTSpice.
+Powstało wiele dokładnych modeli\cite{1634598_BATT_MODELS} ogniw litowo-jonowych, opisujących stan naładowania i~odpowiedzi czasowe z~dokładnością poniżej 1\%, jednak na potrzeby weryfikacji jakości regulacji prądu na poziomie sprzętowym, ze względu na małą dynamikę zmian, użyty został zastępczy model elektryczny 1. rzędu o~parametrach jak w~\cite{8759769_cellmodel1storder} (rys. \ref{img:thevenin_model}). Dzięki niemu możliwe było prowadzenie symulacji zachowania się układu w~LTSpice.
 \begin{figure}[hbtp]
     \centering
      \resizebox{0.5\linewidth}{!}{\includegraphics[]{img/cell_model.png}}
      \caption{Model elektryczny ogniwa.\label{img:thevenin_model}}
 \end{figure}
 
-Na potrzeby strojenia regulatora opracowano drugi model uwzględniający całą dynamikę toru sterowania. W celu jego uzyskania, na obiekt podano wymuszenie skokowe o wartości losowej z całego użytecznego przedziału prądów. Na podstawie zapisanych odpowiedzi, z użyciem System Identification Toolbox MATLABa, znaleziono parametry modelu 2. rzędu w postaci transmitancji dyskretnej, najlepiej opisującego zachowanie układu. W ten sposób uwzględniono wszystkie ważne właściwości obiektu. W ten sposób uniezależniono się od błędu związanego z wyborem modelu obiektu bez weryfikacji jego adekwatności.
+Na potrzeby strojenia regulatora opracowano drugi model uwzględniający całą dynamikę toru sterowania. W~celu jego uzyskania, na obiekt podano wymuszenie skokowe o~wartości losowej z~całego użytecznego przedziału prądów. Na podstawie zapisanych odpowiedzi, z~użyciem System Identification Toolbox MATLABa, znaleziono parametry modelu 2. rzędu w~postaci transmitancji dyskretnej, najlepiej opisującego zachowanie układu. W~ten sposób uwzględniono wszystkie ważne właściwości obiektu. W~ten sposób uniezależniono się od błędu związanego z~wyborem modelu obiektu bez weryfikacji jego adekwatności.
 
 \section{Regulator}
-Aby realizować wybraną strategię, konieczne jest użycie struktury regulatora zapewniającej stabilne działanie nawet przy pewnej zmienności parametrów obiektu, wynikającej z różnic technologicznych pomiędzy ogniwami. Wymagania te może spełnić, przy jednoczesnym zachowaniu łatwości implementacji, regulator PI.
+Aby realizować wybraną strategię, konieczne jest użycie struktury regulatora zapewniającej stabilne działanie nawet przy pewnej zmienności parametrów obiektu, wynikającej z~różnic technologicznych pomiędzy ogniwami. Wymagania te może spełnić, przy jednoczesnym zachowaniu łatwości implementacji, regulator PI.
 \begin{equation}
      u(t)=k_{p}\left[e(t)+{\frac {1}{T_{i}}}\int _{0}^{t}e(\tau )d\tau \right]
      \label{eq:PI_timebased}
 \end{equation}
-W celu znalezienia nastaw, utworzono model ciągły obiektu za pomocą podstawienia Tustina. Znalezione numerycznie nastawy $K_p$ i $T_i$ minimalizują czas dojścia do stanu ustalonego przy jednoczesnym spełnieniu warunków:
+W~celu znalezienia nastaw, utworzono model ciągły obiektu za pomocą podstawienia Tustina. Znalezione numerycznie nastawy $K_p$ i~$T_i$ minimalizują czas dojścia do stanu ustalonego przy jednoczesnym spełnieniu warunków:
 \begin{itemize}
     \item przeregulowanie względne < 0.1\%,
     \item zapas fazy > 60\degree,
     \item zapas amplitudy > 10 dB,
     \item stała czasowa części całkującej $T_i$ > okresu próbkowania $h$.
 \end{itemize}
- Po przejściu na model cyfrowy regulatora podstawieniem Tustina uzyskano postać \ref{eq:piz} nadającą się do implementacji z uwzględnieniem dodatkowego opóźnienia zadawania sygnału od pobrania próbki.
+ Po przejściu na model cyfrowy regulatora podstawieniem Tustina uzyskano postać \ref{eq:piz} nadającą się do implementacji z~uwzględnieniem dodatkowego opóźnienia zadawania sygnału od pobrania próbki.
  \begin{equation}
 Kr(z) = \frac{B_1+B_2 z^{-1}}{1 - z^{-1}}, \qquad
 B_1 = K_p\left(1+\frac{h}{2T_i}\right), \quad B_2 = K_p\left(\frac{h}{2T_i}-1\right)
@@ -118,22 +118,22 @@ B_1 = K_p\left(1+\frac{h}{2T_i}\right), \quad B_2 = K_p\left(\frac{h}{2T_i}-1\ri
 
 \chapter{Projekt urządzenia}
 \section{Założenia}
-Urządzenie ma być zdolne do ładowania ogniw litowo-jonowych o różnym składzie anody i katody w standardzie wymiarowym 18650 z ciągłym prądem maksymalnym 3~A. Prąd ładowania ma być regulowany z rozdzielczością piniżej 20~mA, a napięcie utrzymywane z dokładnością do 20~mV. Urządzenie jest zasilane z zasilacza impulsowego o napięciu 5~V i odpowiedniej mocy.
+Urządzenie ma być zdolne do ładowania ogniw litowo-jonowych o~różnym składzie anody i~katody w~standardzie wymiarowym 18650 z~ciągłym prądem maksymalnym 3~A. Prąd ładowania ma być regulowany z~rozdzielczością piniżej 20~mA, a~napięcie utrzymywane z~dokładnością do 20~mV. Urządzenie jest zasilane z~zasilacza impulsowego o~napięciu 5~V i~odpowiedniej mocy.
 \section{Identyfikacja kluczowych obszarów projektu}
-Aby można było realizować płynną regulację prądu wyjściowego można zastosować regulator liniowy lub przetwornice impulsowa o regulowanym napięciu wyjściowym. Ze względu na fakt, że urządzenie ma nadawać się do badań wpływu procesu ładowania na parametry ogniw, zdecydowano się na regulator liniowy, aby nie trzeba było badać stabilności napięcia ładowania i poziomu niepożądanych szumów, mogących wpłynąć na jakość wyników prób. Wybrany sposób ograniczenia prądu ma taką zaletę, że tłumi zakłócenia pochodzące z zasilania.
+Aby można było realizować płynną regulację prądu wyjściowego można zastosować regulator liniowy lub przetwornice impulsowa o~regulowanym napięciu wyjściowym. Ze względu na fakt, że urządzenie ma nadawać się do badań wpływu procesu ładowania na parametry ogniw, zdecydowano się na regulator liniowy, aby nie trzeba było badać stabilności napięcia ładowania i~poziomu niepożądanych szumów, mogących wpłynąć na jakość wyników prób. Wybrany sposób ograniczenia prądu ma taką zaletę, że tłumi zakłócenia pochodzące z~zasilania.
 
-Wadą tego rozwiązania jest spora strata energii, a w konsekwencji znaczące wydzielanie się ciepła w układzie. Dla układu tworzonego w celach badawczych takie marnotrawstwo energii jest bez znaczenia, jednak temperatura komponentów ma duży wpływ na ich żywotność, a co za tym idzie powtarzalność procesu. Stąd istotne dla stabilnego działania układu jest zapewnienie skutecznego chłodzenia.
+Wadą tego rozwiązania jest spora strata energii, a~w konsekwencji znaczące wydzielanie się ciepła w~układzie. Dla układu tworzonego w~celach badawczych takie marnotrawstwo energii jest bez znaczenia, jednak temperatura komponentów ma duży wpływ na ich żywotność, a~co za tym idzie powtarzalność procesu. Stąd istotne dla stabilnego działania układu jest zapewnienie skutecznego chłodzenia.
 
-Aby można było śledzić postęp ładowania i w prosty sposób zadawać parametry, przydatna jest komunikacja z komputerem. Wymagania co do kanału komunikacyjnego nie są wygórowane --- ilość danych do przekazania jest niewielka, a okres przesyłania jest rzędu 1~s.
+Aby można było śledzić postęp ładowania i~w prosty sposób zadawać parametry, przydatna jest komunikacja z~komputerem. Wymagania co do kanału komunikacyjnego nie są wygórowane --- ilość danych do przekazania jest niewielka, a~okres przesyłania jest rzędu 1~s.
 
-Kontroler układu musi odpowiadać także za kwestie bezpieczeństwa --- minimalna funkcjonalność to ograniczenie lub odcięcie prądu w przypadku wzrostu temperatury ogniwa ponad ustaloną wartość.
+Kontroler układu musi odpowiadać także za kwestie bezpieczeństwa --- minimalna funkcjonalność to ograniczenie lub odcięcie prądu w~przypadku wzrostu temperatury ogniwa ponad ustaloną wartość.
 
-\section{Proponowane rozwiązania i wybór komponentów}
-Ze względu na wysoki założony prąd ładowania i niewielką różnicę napięcia pomiędzy maksymalnym napięciem na ogniwie (4.2~V) a napięciem zasilania (5~V) nie znaleziono żadnych gotowych rozwiązań zintegrowanych pozwalających na dostatecznie precyzyjną kontrolę prądu. W związku z tym wybrano rozwiązanie oparte o tranzystor MOSFET z kanałem typu P, sterowny przez wzmacniacz operacyjny w pętli sprzężenia zwrotnego.
+\section{Proponowane rozwiązania i~wybór komponentów}
+Ze względu na wysoki założony prąd ładowania i~niewielką różnicę napięcia pomiędzy maksymalnym napięciem na ogniwie (4.2~V) a~napięciem zasilania (5~V) nie znaleziono żadnych gotowych rozwiązań zintegrowanych pozwalających na dostatecznie precyzyjną kontrolę prądu. W~związku z~tym wybrano rozwiązanie oparte o~tranzystor MOSFET z~kanałem typu P, sterowny przez wzmacniacz operacyjny w~pętli sprzężenia zwrotnego.
 
-Podczas działania układu, w momencie gdy ogniwo jest rozładowane, a napięcie na nim wynosi 3~V, dla prądu maksymalnego moc wydzielana na tranzystorze wynosi 5.3~W. Jest to stosunkowo dużo, zważywszy na małe rozmiary użytego tranzystora. W tym celu zaproponowano użycie laminatu o ponadstandardowej grubości miedzi i pasywnych radiatorów wlutowanych bezpośrednio wokół tranzystora.
+Podczas działania układu, w~momencie gdy ogniwo jest rozładowane, a~napięcie na nim wynosi 3~V, dla prądu maksymalnego moc wydzielana na tranzystorze wynosi 5.3~W. Jest to stosunkowo dużo, zważywszy na małe rozmiary użytego tranzystora. W~tym celu zaproponowano użycie laminatu o~ponadstandardowej grubości miedzi i~pasywnych radiatorów wlutowanych bezpośrednio wokół tranzystora.
 
-Do sterowania całym układem wybrano 8-bitowy mikrokontroler firmy Microchip: ATtiny414. Zawiera on wszystkie potrzebne peryferia od razu zintegrowane w jednym układzie, przy jednoczesnym zachowaniu niskiej ceny. 
+Do sterowania całym układem wybrano 8-bitowy mikrokontroler firmy Microchip: ATtiny414. Zawiera on wszystkie potrzebne peryferia od razu zintegrowane w~jednym układzie, przy jednoczesnym zachowaniu niskiej ceny. 
 \section{Projekt struktury}
 Wybrana struktura układu regulacji prezentuje się jak na rys. \ref{dia:reg_all}. 
 \begin{figure}
@@ -141,23 +141,23 @@ Wybrana struktura układu regulacji prezentuje się jak na rys. \ref{dia:reg_all
      \caption{Schemat blokowy układu regulacji\label{dia:reg_all}}
 \end{figure}
 
-Mikrokontroler (uC) mierzy za pomocą wewnętrznego przetwornika A/C napięcie na obu biegunach ogniwa, po czym odejmuje je od siebie aby uzyskać napięcie na samym ogniwie Ucell. Na podstawie wybranego przebiegu procesu ładowania, wyliczany jest prąd I który powinien być aktualnie podawany na baterię i zadawany przez regulator PI za pośrednictwem odpowiedniego napięcia Uset generowanego przez wewnętrzny przetwornik C/A. Wzmacniacz operacyjny porównuje jego wartość z napięciem na rezystorze pomiarowym Rs i odpowiednio wysterowuje bramkę tranzystora. Fakt użycia tranzystora z kanałem typu P, otwieranego napięciem ujemnym jest uwzględniony w modelu przez ujemne wzmocnienie wzmacniacza $\mathrm{-k}$. Prąd płynący przez tranzystor powoduje powstawanie napięcia Ucell na ogniwie, które zależy także od temperatury ogniwa To, stopnia naładowania SOC a także zużycia ogniwa. Dodatkowo zaznaczono wpływ napięcia Ucell oraz temperatury tranzystora T jako zakłócenia, które wraz z mocno nieliniową charakterystyką MOSFETa uzasadniają dodanie wewnętrznej pętli sprzężenia zwrotnego.
+Mikrokontroler (uC) mierzy za pomocą wewnętrznego przetwornika A/C napięcie na obu biegunach ogniwa, po czym odejmuje je od siebie aby uzyskać napięcie na samym ogniwie Ucell. Na podstawie wybranego przebiegu procesu ładowania, wyliczany jest prąd I~który powinien być aktualnie podawany na baterię i~zadawany przez regulator PI za pośrednictwem odpowiedniego napięcia Uset generowanego przez wewnętrzny przetwornik C/A. Wzmacniacz operacyjny porównuje jego wartość z~napięciem na rezystorze pomiarowym Rs i~odpowiednio wysterowuje bramkę tranzystora. Fakt użycia tranzystora z~kanałem typu P, otwieranego napięciem ujemnym jest uwzględniony w~modelu przez ujemne wzmocnienie wzmacniacza $\mathrm{-k}$. Prąd płynący przez tranzystor powoduje powstawanie napięcia Ucell na ogniwie, które zależy także od temperatury ogniwa To, stopnia naładowania SOC a~także zużycia ogniwa. Dodatkowo zaznaczono wpływ napięcia Ucell oraz temperatury tranzystora T~jako zakłócenia, które wraz z~mocno nieliniową charakterystyką MOSFETa uzasadniają dodanie wewnętrznej pętli sprzężenia zwrotnego.
 
 Realizacja 'części wykonawczej' tego układu jest przedstawiona na rys. \ref{img:charging_circuit}. 
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/CHARGING_LINE_SCHEMATIC.png}}
      \caption{Schemat części wykonawczej ładowarki. \label{img:charging_circuit}}
 \end{figure}
-Aby zachować w maksymalnym stopniu użyteczną rozdzielczość przetwornika C/A, konieczne było dopasowanie poziomów napięć dzielnikiem napięcia.
+Aby zachować w~maksymalnym stopniu użyteczną rozdzielczość przetwornika C/A, konieczne było dopasowanie poziomów napięć dzielnikiem napięcia.
 
 \subsection{Element wykonawczy: tranzystor MOS typu P\label{section:mosfet} }
 Wymagania jakie stawia dla MOSFETa taka struktura układu są następujące:
 \begin{itemize}
     \item napięcie graniczne $U_{GS(th)} < 2.5\mathrm{V}$, pozwalające na całkowite otwarcie tranzystora przy rozładowanym ogniwie.
     \item niski opór otwarcia $R_{DS(on)}$, nie ograniczający prądu przy wystąpieniu dużej rezystancji wewnętrznej ogniwa.
-    \item mały opór termiczny złącze-obudowa $R_{thJC}$, pozwalający na rozproszenie ciepła podczas pracy w trybie liniowym
+    \item mały opór termiczny złącze-obudowa $R_{thJC}$, pozwalający na rozproszenie ciepła podczas pracy w~trybie liniowym
 \end{itemize}
-Aby wybrać najlepiej działający tranzystor, projekt PCB przygotowano tak, aby można było wlutować tranzystory w 3 różnych standardach obudowy. Porównanie parametrów wybranych elementów znajduje się w tablicy \ref{tab:mosfets}.
+Aby wybrać najlepiej działający tranzystor, projekt PCB przygotowano tak, aby można było wlutować tranzystory w~3 różnych standardach obudowy. Porównanie parametrów wybranych elementów znajduje się w~tablicy \ref{tab:mosfets}.
 
 \begin{table}[hbtp]
 \caption{Parametry wybranych tranzystorów.\label{tab:mosfets}}
@@ -177,29 +177,29 @@ SI7615CDN-T1-GE3 & max 1000 & 20.3 & 2.9 & PPak 1212-8 \\
 \end{table}
 Jak widać, AON7423 jest pod każdym względem lepszy został wybrany jako docelowy.
 \subsection{Regulator tranzystora: wzmacniacz operacyjny}
-Ze względu na wybór tranzystora MOS, aby umożliwić kontrolę prądu prostymi algorytmami regulacji konieczne jest jego zlinearyzowanie. Zastosowanie pętli sprzężenia zwrotnego o dużym wzmocnieniu pozwoliło na zadawanie prąd za pomocą napięcia generowanego przez przetwornik C/A mikrokontrolera, które to jest porównywane z napięciem na rezystorze pomiarowym. Dodatkowo takie rozwiązanie zapewniło eliminację wpływu temperatury tranzystora (która ulega znacznym wahaniom) oraz napięcia dren-źródło $U_{DS}$ (zależnego od stanu naładowania ogniwa) prąd wyjściowy. Taka konfiguracja ma jednak wadę: sprzężenie reaguje na prąd płynący przez rezystor $\mathrm{R_s}$, stąd przy małych wartościach tego prądu mogą wystąpić problemy z domknięciem tranzystora --- pewien niewielki prąd będzie cały czas doładowywał ogniwo, ale gdy zostanie on utrzymany na niskim poziomie, nie będzie miało to większego wpływu na działanie układu.
+Ze względu na wybór tranzystora MOS, aby umożliwić kontrolę prądu prostymi algorytmami regulacji konieczne jest jego zlinearyzowanie. Zastosowanie pętli sprzężenia zwrotnego o~dużym wzmocnieniu pozwoliło na zadawanie prąd za pomocą napięcia generowanego przez przetwornik C/A mikrokontrolera, które to jest porównywane z~napięciem na rezystorze pomiarowym. Dodatkowo takie rozwiązanie zapewniło eliminację wpływu temperatury tranzystora (która ulega znacznym wahaniom) oraz napięcia dren-źródło $U_{DS}$ (zależnego od stanu naładowania ogniwa) prąd wyjściowy. Taka konfiguracja ma jednak wadę: sprzężenie reaguje na prąd płynący przez rezystor $\mathrm{R_s}$, stąd przy małych wartościach tego prądu mogą wystąpić problemy z~domknięciem tranzystora --- pewien niewielki prąd będzie cały czas doładowywał ogniwo, ale gdy zostanie on utrzymany na niskim poziomie, nie będzie miało to większego wpływu na działanie układu.
 
-Aby zapewnić możliwość całkowitego otwarcia lub zamknięcie tranzystora, konieczne jest użycie wzmacniacza typu rail-to-rail na wyjściu. Dodatkowo, ze względu na wydzielane w układzie ciepło, wybrano wzmacniacz o bardzo niskim współczynniku cieplnym wejściowego napięcia niezrównoważenia ('zero drift'). Ponieważ dokładność działania zależy od wejściowego napięcia niezrównoważenia, zwrócono uwagę także aby ten parametr był utrzymany na niskim poziomie ('zero offset').
+Aby zapewnić możliwość całkowitego otwarcia lub zamknięcie tranzystora, konieczne jest użycie wzmacniacza typu rail-to-rail na wyjściu. Dodatkowo, ze względu na wydzielane w~układzie ciepło, wybrano wzmacniacz o~bardzo niskim współczynniku cieplnym wejściowego napięcia niezrównoważenia ('zero drift'). Ponieważ dokładność działania zależy od wejściowego napięcia niezrównoważenia, zwrócono uwagę także aby ten parametr był utrzymany na niskim poziomie ('zero offset').
 
-Wybrano wzmacniacz AD8551, który zapewnia 'input offset drift' nie większy niż $\mathrm{0.01\, \mu V/\degree C}$ i bardzo niskie wejściowe napięcie niezrównoważenia $\mathrm{<1\,\mu V}$
+Wybrano wzmacniacz AD8551, który zapewnia 'input offset drift' nie większy niż $\mathrm{0.01\, \mu V/\degree C}$ i~bardzo niskie wejściowe napięcie niezrównoważenia $\mathrm{<1\,\mu V}$
 \subsection{Element pomiarowy: rezystor}
-Do pomiaru prądu płynącego przez ogniwo zastosowano rezystor o oporze $\mathrm{8\,m\Omega}$. Maksymalny spadek napięcia na elemencie pomiarowym, zapewniający poprawne działanie układy i odpowiednią dokładność pomiaru bez zbędnej komplikacji struktury przewidziany był na 250mV. Zastosowany opornik w przewidzianym zakresie użytkowania daje napięcie maksymalne $U_{rs(max)}=0.08\,\Omega \cdot 3\,\mathrm{A = 240\,mV}$. Wybór nieoptymalnej wartości jest spowodowany brakiem dostępności na rynku opornika o tej rezystancji i dokładności dokładności 1\%. Maksymalna moc ciągła wydzielana na oporniku wynosi $R_s*I_{cell(max)}^2 = 0.08\cdot3^2 = 0.72\,\mathrm{W}$, co maksymalnej dopuszczonej przez producenta mocy 3~W (zapas ponad 300\%), konstrukcji opartej o pytkę ze specjalnego stopu, umieszczeniu w dużej odległości od źródeł ciepła i dobrym jego odprowadzaniu ma zapewniać minimalizację błędów wynikających ze zmian oporu wraz z temperaturą i zabezpieczać przed skutkami chwilowych skoków prądu.
+Do pomiaru prądu płynącego przez ogniwo zastosowano rezystor o~oporze $\mathrm{8\,m\Omega}$. Maksymalny spadek napięcia na elemencie pomiarowym, zapewniający poprawne działanie układy i~odpowiednią dokładność pomiaru bez zbędnej komplikacji struktury przewidziany był na 250mV. Zastosowany opornik w~przewidzianym zakresie użytkowania daje napięcie maksymalne $U_{rs(max)}=0.08\,\Omega \cdot 3\,\mathrm{A = 240\,mV}$. Wybór nieoptymalnej wartości jest spowodowany brakiem dostępności na rynku opornika o~tej rezystancji i~dokładności dokładności 1\%. Maksymalna moc ciągła wydzielana na oporniku wynosi $R_s*I_{cell(max)}^2 = 0.08\cdot3^2 = 0.72\,\mathrm{W}$, co maksymalnej dopuszczonej przez producenta mocy 3~W (zapas ponad 300\%), konstrukcji opartej o~pytkę ze specjalnego stopu, umieszczeniu w~dużej odległości od źródeł ciepła i~dobrym jego odprowadzaniu ma zapewniać minimalizację błędów wynikających ze zmian oporu wraz z~temperaturą i~zabezpieczać przed skutkami chwilowych skoków prądu.
 \subsection{Sterownik, regulator, zadajnik: mikrokontroler}
-W rozważanym układzie przed mikrokontrolerem stawia się następujące zadania:
+W~rozważanym układzie przed mikrokontrolerem stawia się następujące zadania:
 \begin{itemize}
     \item sterowanie następowaniem po sobie etapów procesu,
     \item regulacja prądu dostarczanego do ogniwa,
-    \item zadawanie wartości tego prądu z użyciem przetwornika C/A,
+    \item zadawanie wartości tego prądu z~użyciem przetwornika C/A,
     \item pomiar napięcia na ogniwie,
     \item zapewnienie bezpieczeństwa procesu,
-    \item obsługa przycisków i diód sygnalizacyjnych,
-    \item komunikacja z komputerem.
+    \item obsługa przycisków i~diód sygnalizacyjnych,
+    \item komunikacja z~komputerem.
 \end{itemize}
-W tym celu wybrano jednostkę ATtiny414, której istotne dla projektu parametry wyszczególniono poniżej, za \cite{tiny414datasheet}:
+W~tym celu wybrano jednostkę ATtiny414, której istotne dla projektu parametry wyszczególniono poniżej, za \cite{tiny414datasheet}:
 \begin{itemize}
-    \item procesor: AVR RISC 8 bit, 20 MHz, sprzętowe mnożenie,
-    \item pamięć: 4 kB program, 256 B SRAM,
-    \item DAC: 8 bit, wewnętrzne napięcie odniesienia,
+    \item procesor: AVR RISC 8~bit, 20 MHz, sprzętowe mnożenie,
+    \item pamięć: 4~kB program, 256 B~SRAM,
+    \item DAC: 8~bit, wewnętrzne napięcie odniesienia,
     \item ADC: 10 bit, akumulacja do 64 pomiarów, wewnętrzne napięcie odniesienia, 
     \item nap. odniesienia: 4.3, 2.5, 1.5, 1.1, 0.55 V,
     \item sprzętowe wsparcie UART,
@@ -207,126 +207,126 @@ W tym celu wybrano jednostkę ATtiny414, której istotne dla projektu parametry 
 \end{itemize}
 
 \section{Projekt PCB}
-Projekt płytki drukowanej, przedstawiony na rys. \ref{img:pcb_colored} został wykonany w środowisku KiCad. Wykonanie projektu przewidziano na laminacie dwustronnym o grubości miedzi 70~um.
+Projekt płytki drukowanej, przedstawiony na rys. \ref{img:pcb_colored} został wykonany w~środowisku KiCad. Wykonanie projektu przewidziano na laminacie dwustronnym o~grubości miedzi 70~um.
 
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/plytka_bw.png}}
      \caption{Projekt PCB. \label{img:pcb_colored}}
 \end{figure}
 
-Aby zapewnić odporność na zakłócenia i zmniejszoną emisję fal elektromagnetycznych, na ile to możliwe zachowano ciągłość masy GND na spodniej powierzchni płytki. W tym samym celu rozlano +5~V na górnej powierzchni. 
+Aby zapewnić odporność na zakłócenia i~zmniejszoną emisję fal elektromagnetycznych, na ile to możliwe zachowano ciągłość masy GND na spodniej powierzchni płytki. W~tym samym celu rozlano +5~V na górnej powierzchni. 
 
-Aby umożliwić przetestowanie kilku tranzystorów jak zaznaczono w punkcie \ref{section:mosfet}, przewidziane są pola na 3 różne standardy wyprowadzeń. Wokół niech znajdują się otwory, w których przewidziany jest montaż odcinków drutu 0.75 mm$^2$, pełniących rolę radiatora.
+Aby umożliwić przetestowanie kilku tranzystorów jak zaznaczono w~punkcie \ref{section:mosfet}, przewidziane są pola na 3~różne standardy wyprowadzeń. Wokół niech znajdują się otwory, w~których przewidziany jest montaż odcinków drutu 0.75 mm$^2$, pełniących rolę radiatora.
 
-Rezystor pomiarowy znajduje się między ujemnym biegunem ogniwa i masą, maksymalnie oddalony od źródła ciepła jakim jest tranzystor. 
+Rezystor pomiarowy znajduje się między ujemnym biegunem ogniwa i~masą, maksymalnie oddalony od źródła ciepła jakim jest tranzystor. 
 
-Sygnał z biegunów jest doprowadzony do wejść przetwornika A/C, a napięcie na rezystorze pomiarowym względem wspólnej masy doprowadzone jest również do wzmacniacza operacyjnego. Aby zabezpieczyć się przed zakłóceniami pochodzącymi od układu próbkującego przetwornika A/C, sygnał z ujemnego bieguna jest doprowadzony do mikrokontrolera przez rezystor 1 k$\Omega$ i buforowany na miejscu kondensatorem 100~nF. Kondensator znajduje się również przy doprowadzeniu sygnału z bieguna dodatniego, aby ograniczyć ewentualny wpływ impedancji linii.
+Sygnał z~biegunów jest doprowadzony do wejść przetwornika A/C, a~napięcie na rezystorze pomiarowym względem wspólnej masy doprowadzone jest również do wzmacniacza operacyjnego. Aby zabezpieczyć się przed zakłóceniami pochodzącymi od układu próbkującego przetwornika A/C, sygnał z~ujemnego bieguna jest doprowadzony do mikrokontrolera przez rezystor 1~k$\Omega$ i~buforowany na miejscu kondensatorem 100~nF. Kondensator znajduje się również przy doprowadzeniu sygnału z~bieguna dodatniego, aby ograniczyć ewentualny wpływ impedancji linii.
 
-Założono, że napięcie na rezystorze pomiarowym będzie nie większe niż 250~mV, zatem sygnał do z przetwornika C/A musi zawierać się w tym samym przedziale. Aby w pełni wykorzystać rozdzielczość przetwornika, wybrano wewnętrzne napięcie odniesienia 2.5~V, stąd najwyższe napięcie wyjściowe wyniesie 2.49~V. Aby dopasować je do napięć na elemencie pomiarowym, wykorzystano dzielnik napięcia złożony z rezystorów 10k i 100k.
+Założono, że napięcie na rezystorze pomiarowym będzie nie większe niż 250~mV, zatem sygnał do z~przetwornika C/A musi zawierać się w~tym samym przedziale. Aby w~pełni wykorzystać rozdzielczość przetwornika, wybrano wewnętrzne napięcie odniesienia 2.5~V, stąd najwyższe napięcie wyjściowe wyniesie 2.49~V. Aby dopasować je do napięć na elemencie pomiarowym, wykorzystano dzielnik napięcia złożony z~rezystorów 10k i~100k.
 \section{Weryfikacja projektu za pomocą symulacji SPICE}
-Istotny fragment projektu został zamodelowany w programie LTSpice jak na rys. \ref{img:modelLTv1}
+Istotny fragment projektu został zamodelowany w~programie LTSpice jak na rys. \ref{img:modelLTv1}
 \begin{figure}[hbtp]
 \centering
      \resizebox{0.8\linewidth}{!}{\includegraphics{img/odlschem.png}}
-     \caption{Model w części wykonawczej w LTSpice. \label{img:modelLTv1}}
+     \caption{Model w~części wykonawczej w~LTSpice. \label{img:modelLTv1}}
 \end{figure}
-Model ogniwa został przyjęty za \cite{8759769_cellmodel1storder}. W praktyce dla symulacji znaczenie ma tylko rezystancja szeregowa równa 120m$\Omega$ i napięcie na ogniwie.
+Model ogniwa został przyjęty za \cite{8759769_cellmodel1storder}. W~praktyce dla symulacji znaczenie ma tylko rezystancja szeregowa równa 120m$\Omega$ i~napięcie na ogniwie.
 
-Symulacja typu transient dla prądów 230 i 2730 mA przy napięciach na ogniwie 2.5, 4 i 4.2 V wykazała poprawne zachowanie układu, napięcia bez oscylacji osiągały zadane wartości.\remark{dobrze by umieścić te wyniki w pracy. Te charakterystyki Nyquista lub/i Bodego też.}
+Symulacja typu transient dla prądów 230 i~2730 mA przy napięciach na ogniwie 2.5, 4~i 4.2 V~wykazała poprawne zachowanie układu, napięcia bez oscylacji osiągały zadane wartości.\remark{dobrze by umieścić te wyniki w~pracy. Te charakterystyki Nyquista lub/i Bodego też.}
 
 \chapter{Realizacja prototypu}
-\section{Kolejność działania i bieżąca modyfikacja projektu\label{section:przerobki}}
-Płytka drukowana została wykonana metodą termotransferu. Z powodu braku soldermaski projekt realizowany jest etapami, aby zweryfikować poprawność montażu. Kolejność działań jest następująca:
+\section{Kolejność działania i~bieżąca modyfikacja projektu\label{section:przerobki}}
+Płytka drukowana została wykonana metodą termotransferu. Z~powodu braku soldermaski projekt realizowany jest etapami, aby zweryfikować poprawność montażu. Kolejność działań jest następująca:
 \begin{enumerate}
-    \item Weryfikacja i ewentualna naprawa ścieżek.
-    \item Montaż mikrokontrolera wraz z koniecznymi elementami pasywnymi i sprawdzenie działania linii programowania.
-    \item Montaż elementów pasywnych, diód sygnalizacyjnych i przycisków.
+    \item Weryfikacja i~ewentualna naprawa ścieżek.
+    \item Montaż mikrokontrolera wraz z~koniecznymi elementami pasywnymi i~sprawdzenie działania linii programowania.
+    \item Montaż elementów pasywnych, diód sygnalizacyjnych i~przycisków.
     \item Weryfikacja działania linii komunikacyjnych.
     \item Weryfikacja działaniu pomiaru napięcia ogniwa oraz przetwornika C/A.
-    \item Montaż i sprawdzenie działania wzmacniacza.
-    \item Montaż i sprawdzenie działania tranzystora.
-    \item Budowa obciążenia testowego i pierwsze testy działania z docelowym rezystorem.
+    \item Montaż i~sprawdzenie działania wzmacniacza.
+    \item Montaż i~sprawdzenie działania tranzystora.
+    \item Budowa obciążenia testowego i~pierwsze testy działania z~docelowym rezystorem.
     \item Kalibracja przetwornika A/C.
-    \item Montaż uchwytu ogniwa i testy na ogniwie.
+    \item Montaż uchwytu ogniwa i~testy na ogniwie.
 \end{enumerate}
-Podczas wykonywania PCB w skutek defektu warstwy zabezpieczającej ścieżka doprowadzająca sygnał z dodatniego bieguna ogniwa została podtrawiona powodując przerwę około 1mm, co zostało naprawione mostkiem z drutu.
+Podczas wykonywania PCB w~skutek defektu warstwy zabezpieczającej ścieżka doprowadzająca sygnał z~dodatniego bieguna ogniwa została podtrawiona powodując przerwę około 1mm, co zostało naprawione mostkiem z~drutu.
 
-Nowa seria mikrokontrolerów ATtiny (produkowana przez Microchip po przejęciu Atmel), do której należy wybrana jednostka, aby zwiększyć liczbę możliwych do wykorzystania pinów, jest programowana przez interfejs UPDI, który pozwala na komunikację half-duplex po jednym linii, pomijając połączenie masy. Ze względu na fakt, że sygnały są identyczne jak w standardzie UART, wykorzystano rozwiązanie pozwalające na programowanie z użyciem zwykłego adaptera USB-TTL i rezystora\cite{pyupdi}.
+Nowa seria mikrokontrolerów ATtiny (produkowana przez Microchip po przejęciu Atmel), do której należy wybrana jednostka, aby zwiększyć liczbę możliwych do wykorzystania pinów, jest programowana przez interfejs UPDI, który pozwala na komunikację half-duplex po jednym linii, pomijając połączenie masy. Ze względu na fakt, że sygnały są identyczne jak w~standardzie UART, wykorzystano rozwiązanie pozwalające na programowanie z~użyciem zwykłego adaptera USB-TTL i~rezystora\cite{pyupdi}.
 \begin{figure}[hbtp]
 \centering
      \resizebox{0.8\linewidth}{!}{\includegraphics[]{img/pyupdi.png}}
-     \caption{Podłączenie programatora, wykorzystano grafikę z \cite{pyupdi}\label{img:pyupdi}}
+     \caption{Podłączenie programatora, wykorzystano grafikę z~\cite{pyupdi}\label{img:pyupdi}}
 \end{figure}
 
-Producent zaleca podłączenie kondensatora chroniącego przed zakłóceniami pomiędzy pin resetu a masę, jednocześnie ostrzegając, że dla niektórych innych interfejsów komunikacyjnych może uniemożliwić to ich funkcjonowanie\cite{avr_hardware}. Jak sprawdzono, konieczne było usunięcie kondensatora także w przypadku UPDI.
+Producent zaleca podłączenie kondensatora chroniącego przed zakłóceniami pomiędzy pin resetu a~masę, jednocześnie ostrzegając, że dla niektórych innych interfejsów komunikacyjnych może uniemożliwić to ich funkcjonowanie\cite{avr_hardware}. Jak sprawdzono, konieczne było usunięcie kondensatora także w~przypadku UPDI.
 
-Podczas montażu diód sygnalizacyjnych okazało się, że użyty footprint jest przeznaczony dla elementu ze wspólną katodą, a zakupiony komponent miał niezależne katody, położone na innych pinach. Obrócenie i włączanie zwieraniem do masy zamiast do zasilania umożliwiło zachowanie PCB.
+Podczas montażu diód sygnalizacyjnych okazało się, że użyty footprint jest przeznaczony dla elementu ze wspólną katodą, a~zakupiony komponent miał niezależne katody, położone na innych pinach. Obrócenie i~włączanie zwieraniem do masy zamiast do zasilania umożliwiło zachowanie PCB.
 
-Podczas weryfikacji działania przetworników stwierdzono, że układ C/A działa jak zakładano, a układ A/C zaniża mierzone napięcie o około 0.5V. Błąd ten był stały w mierzonych przedziałach, więc odpowiednia kalibracja, przeprowadzona w późniejszych etapach pozwoliła go wyeliminować.
+Podczas weryfikacji działania przetworników stwierdzono, że układ C/A działa jak zakładano, a~układ A/C zaniża mierzone napięcie o~około 0.5V. Błąd ten był stały w~mierzonych przedziałach, więc odpowiednia kalibracja, przeprowadzona w~późniejszych etapach pozwoliła go wyeliminować.
 
-Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2 ścieżek i dodanie 3 rezystorów 0~$\Omega$ pozwoliło w stosunkowo czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
+Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i~masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2~ścieżek i~dodanie 3~rezystorów 0~$\Omega$ pozwoliło w~stosunkowo czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
 
-Po zamontowaniu tranzystora stwierdzono, że w skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w większości zastosowań), a co za tym idzie, dren ze źródłem był zamieniony. Po wykryciu, że powodem przepływu prądu oraz pewnego spadku napięcia jest wewnętrzna dioda, a następnie odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Ze względu na brak możliwości realizacji radiatora zgodnie z projektem, wykorzystano radiator z blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degreeC/W}$ przy naturalnej konwekcji. 
+Po zamontowaniu tranzystora stwierdzono, że w~skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w~większości zastosowań), a~co za tym idzie, dren ze źródłem był zamieniony. Po wykryciu, że powodem przepływu prądu oraz pewnego spadku napięcia jest wewnętrzna dioda, a~następnie odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i~przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Ze względu na brak możliwości realizacji radiatora zgodnie z~projektem, wykorzystano radiator z~blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o~deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degreeC/W}$ przy naturalnej konwekcji. 
 
-Ponieważ podanie zbyt dużego napięcia na ogniwo lub zwarcie biegunów może prowadzić do zniszczenia ogniwa a nawet zapalenia się, aby bezpiecznie sprawdzić działanie układu wykonano obciążenie testowe z diód o odpowiedniej mocy, którego schemat przedstawiono na rys. \ref{img:testload}. Urządzenie to pozwala także na bezpieczne rozładowanie ogniw do około 2.5~V.
+Ponieważ podanie zbyt dużego napięcia na ogniwo lub zwarcie biegunów może prowadzić do zniszczenia ogniwa a~nawet zapalenia się, aby bezpiecznie sprawdzić działanie układu wykonano obciążenie testowe z~diód o~odpowiedniej mocy, którego schemat przedstawiono na rys. \ref{img:testload}. Urządzenie to pozwala także na bezpieczne rozładowanie ogniw do około 2.5~V.
 \begin{figure}[hbtp]
     \centering
     \resizebox{0.5\linewidth}{!}{\includegraphics[]{img/testload.png}}
     \caption{Schemat obciążenia testowego. \label{img:testload}}
 \end{figure}
 
-Wykorzystując fakt, że napięcie przewodzenia diód zmienia się w zależności od prądu, wykonano pomiary przez przetwornik A/C i niezależny woltomierz, tak aby skalibrować przetwornik. Zebrano dane dla obu stron ogniwa, i dla osiągnięcia większej dokładności skalibrowano je niezależnie.
+Wykorzystując fakt, że napięcie przewodzenia diód zmienia się w~zależności od prądu, wykonano pomiary przez przetwornik A/C i~niezależny woltomierz, tak aby skalibrować przetwornik. Zebrano dane dla obu stron ogniwa, i~dla osiągnięcia większej dokładności skalibrowano je niezależnie.
 \begin{figure}[hbtp]
     \input{plots/Hfit.tex}
      \caption{Kalibracja przetwornika A/C: dodatni biegun ogniwa. \label{img:ADCfitting}}
 \end{figure}
-Dzięki temu odwzorowano pomiary woltomierzem z dokładnością do 0.01~V.
+Dzięki temu odwzorowano pomiary woltomierzem z~dokładnością do 0.01~V.
 
-Aby ułatwić testy, zgodnie z metodą 'hardware-in-the-loop', cały proces nadzoruje skrypt w środowisku MATLAB, a mikroprocesor zajmuje się wymianą danych między peryferiami a komputerem.
+Aby ułatwić testy, zgodnie z~metodą 'hardware-in-the-loop', cały proces nadzoruje skrypt w~środowisku MATLAB, a~mikroprocesor zajmuje się wymianą danych między peryferiami a~komputerem.
 
 Testy wykonane na docelowych ogniwach przebiegły pomyślnie. Ze względu na dużą rezystancje wewnętrzną głęboko rozładowanych ogniw, moc wydzielana na tranzystorze nigdy nie osiąga zakładanej wartości. Temperatura na tranzystorze nie przekracza maksymalnie dopuszczalnej.
 
 \section{Stan finalny części sprzętowej}
-Ostatecznie projekt wykonany jest na bazie płytki PCB z oryginalnego projektu z modyfikacjami z punktu \ref{section:przerobki}. Sprawdzono z pozytywnym wynikiem stabilność funkcjonowania dla prądu 2~A i napięcia początkowego ogniwa 2.5~V, co przekłada się na około 3.7~W mocy wydzielanej na tranzystorze. Na testy większych obciążeń nie pozwalają posiadane ogniwa.
+Ostatecznie projekt wykonany jest na bazie płytki PCB z~oryginalnego projektu z~modyfikacjami z~punktu \ref{section:przerobki}. Sprawdzono z~pozytywnym wynikiem stabilność funkcjonowania dla prądu 2~A i~napięcia początkowego ogniwa 2.5~V, co przekłada się na około 3.7~W mocy wydzielanej na tranzystorze. Na testy większych obciążeń nie pozwalają posiadane ogniwa.
 
 \section{Implementacja potrzebnych funkcjonalności}
-Regulator dyskretny \ref{eq:piz} jest w formie nadającej się do implementacji.
+Regulator dyskretny \ref{eq:piz} jest w~formie nadającej się do implementacji.
 \begin{verbatim}
     u(i) = u(i-1) + B1*e(i-1) + B2*e(i-2);
 \end{verbatim}
-Implementacja uwzględnia opóźnienie wystawienia sterowania od pobrania próbki o cały okres.
+Implementacja uwzględnia opóźnienie wystawienia sterowania od pobrania próbki o~cały okres.
 Problem windupu jest rozwiązany przez nałożenie ograniczeń wartości wyjściowej.
 
-Ze względu na fakt, że przeznaczeniem urządzenia są zadania eksperymentalne, które zawsze zakładają zbieranie danych na komputerze, zdecydowano o implementacji całej funkcjonalności za pomocą skryptów w środowisku MATLAB. Pozwala to także na bieżącą obserwację parametrów procesu.
+Ze względu na fakt, że przeznaczeniem urządzenia są zadania eksperymentalne, które zawsze zakładają zbieranie danych na komputerze, zdecydowano o~implementacji całej funkcjonalności za pomocą skryptów w~środowisku MATLAB. Pozwala to także na bieżącą obserwację parametrów procesu.
 
-Zaimplementowane funkcjonalności pozwalają na ciągłe monitorowanie napięcia na ogniwie oraz realizacje protokołu ładowania CC-CV do zadanych wartości napięcia oraz prądu maksymalnego i granicznego końcowego.
+Zaimplementowane funkcjonalności pozwalają na ciągłe monitorowanie napięcia na ogniwie oraz realizacje protokołu ładowania CC-CV do zadanych wartości napięcia oraz prądu maksymalnego i~granicznego końcowego.
 
 Skrypt ładujący CC-CV działa następująco:
 \begin{enumerate}
-    \item Sprawdzane są napięcia na stykach uchwytu. Jeżeli nie mieszczą się w założonym przedziale, ładowanie jest wyłączane i użytkownik jest informowany o błędzie.
+    \item Sprawdzane są napięcia na stykach uchwytu. Jeżeli nie mieszczą się w~założonym przedziale, ładowanie jest wyłączane i~użytkownik jest informowany o~błędzie.
     \item Regulator utrzymuje zadane parametry ładowania.
-    \item Po osiągnięciu wartości prądu poniżej progu końcowego lub wystąpieniu błędu, ładowanie jest wyłączane, a użytkownik powiadamiany o rezultacie.
+    \item Po osiągnięciu wartości prądu poniżej progu końcowego lub wystąpieniu błędu, ładowanie jest wyłączane, a~użytkownik powiadamiany o~rezultacie.
 \end{enumerate}
 
 
-\chapter{Testy i weryfikacja}
+\chapter{Testy i~weryfikacja}
 
 
-Wykorzystanie przetwornika A/C na ujemnym biegunie ogniwa nie pozwala na dokładne pomiary wartości prądu, ale daje podgląd dynamiki jego zmian. Przebieg napięć i prądów dla procesu przy wstępnych nastawach przedstawiono na rys. \ref{img:1strun} dla ładowania ogniwa o pojemności nominalnej 2700 mAh prądem 1.9 A do napięcia 4.0 V kończąc ładowanie przy prądzie 1000 mA. 
+Wykorzystanie przetwornika A/C na ujemnym biegunie ogniwa nie pozwala na dokładne pomiary wartości prądu, ale daje podgląd dynamiki jego zmian. Przebieg napięć i~prądów dla procesu przy wstępnych nastawach przedstawiono na rys. \ref{img:1strun} dla ładowania ogniwa o~pojemności nominalnej 2700 mAh prądem 1.9 A~do napięcia 4.0 V~kończąc ładowanie przy prądzie 1000 mA. 
 
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/faktycznie_oscyluje.png}}
      \caption{Pierwsze uruchomienie: niepożądane oscylacje \label{img:1strun}}
 \end{figure}
-W miarę wzrostu napięcia, zaobserwowano narastające szumy: w układzie występują oscylacje. Jako że sygnał z przetwornika jest uśrednieniem 64 kolejnych pomiarów, oscylacje muszą być bardzo znaczące.
+W~miarę wzrostu napięcia, zaobserwowano narastające szumy: w~układzie występują oscylacje. Jako że sygnał z~przetwornika jest uśrednieniem 64 kolejnych pomiarów, oscylacje muszą być bardzo znaczące.
 Najbardziej prawdopodobnym ich źródłem, jako, że objawiają się przede wszystkim wahaniami prądu, jest wadliwy projekt sprzężenia zwrotnego od rezystora pomiarowego do tranzystora. Za pomocą symulacji SPICE zweryfikowano zapas fazy układu dla zestawu parametrów, dla którego wystąpiły największe oscylacje.
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/bode_nocap.png}}
      \caption{Analiza częstotliwościowa dla układu oscylującego. \label{img:bode_nocap}}
 \end{figure}
-W rezultacie stwierdzono, że zapas fazy wynosi około 10\degree. Teoretycznie układ powinien być stabilny dla każdego zapasu fazy > 0\degree, ale w praktyce wiele nieprzewidzianych czynników może doprowadzić do jego obniżenia, na przykład pojemność ścieżki pomiędzy wzmacniaczem a bramką tranzystora (która sama w sobie tworzy kondensator). W praktyce przyjmuje się że zapas fazy powinien wynosić 60\degree \cite{PhaseMargin_TERRELL1996383}.
+W~rezultacie stwierdzono, że zapas fazy wynosi około 10\degree. Teoretycznie układ powinien być stabilny dla każdego zapasu fazy > 0\degree, ale w~praktyce wiele nieprzewidzianych czynników może doprowadzić do jego obniżenia, na przykład pojemność ścieżki pomiędzy wzmacniaczem a~bramką tranzystora (która sama w~sobie tworzy kondensator). W~praktyce przyjmuje się że zapas fazy powinien wynosić 60\degree \cite{PhaseMargin_TERRELL1996383}.
 
-Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano kondensator pomiędzy wejście odwracające a wyjście wzmacniacza (rys. \ref{img:HereYouAreMrCap}), co zwiększyło zapas fazy do 87\degree (rys. \ref{img:MrBodeWithCap}).
+Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano kondensator pomiędzy wejście odwracające a~wyjście wzmacniacza (rys. \ref{img:HereYouAreMrCap}), co zwiększyło zapas fazy do 87\degree (rys. \ref{img:MrBodeWithCap}).
 \begin{figure}[hbtp]
     \centering
      \resizebox{0.7\linewidth}{!}{\includegraphics[]{img/how_cap_was_added.png}}
@@ -346,13 +346,13 @@ Reprezentatywny zapis przebiegu procesu po zastosowanych zmianach przedstawiono 
 
 
 \chapter{Uwagi końcowe}
-Cele postawione w projekcie zostały z sukcesem zrealizowane. Urządzenie jest w stanie regulować prąd i napięcie ładowania, realizując założone strategie ładowania z przewidzianą dokładnością. Proces realizacji urządzenia ujawnił wiele błędów etapu projektowego, które jednak udało się naprawić bez wpływu na skuteczność działania ładowarki. Wykorzystanie wstępnie uruchomionego urządzenia pozwoliło na zebranie danych potrzebnych do określenia modelu, pozwalającego na dalsza poprawę działania. 
+Cele postawione w~projekcie zostały z~sukcesem zrealizowane. Urządzenie jest w~stanie regulować prąd i~napięcie ładowania, realizując założone strategie ładowania z~przewidzianą dokładnością. Proces realizacji urządzenia ujawnił wiele błędów etapu projektowego, które jednak udało się naprawić bez wpływu na skuteczność działania ładowarki. Wykorzystanie wstępnie uruchomionego urządzenia pozwoliło na zebranie danych potrzebnych do określenia modelu, pozwalającego na dalsza poprawę działania. 
 
-Eksperymentalna identyfikacja modelu o odpowiednio dużym stopniu uproszczenia, stanowiła spore wyzwanie. Przełomem było potraktowanie wolno zmiennej składowej odpowiedzi, wynikającej z nieśpiesznego wzrostu napięcia na ogniwie w trakcie ładowanie, jako zakłócenia.
+Eksperymentalna identyfikacja modelu o~odpowiednio dużym stopniu uproszczenia, stanowiła spore wyzwanie. Przełomem było potraktowanie wolno zmiennej składowej odpowiedzi, wynikającej z~nieśpiesznego wzrostu napięcia na ogniwie w~trakcie ładowanie, jako zakłócenia.
 
-Przebieg realizacji pracy ujawnia znaczenie posiadania na etapie projektowym dobrze wybranych modeli obiektu, o~poziomie dokładności adekwatnym do przewidzianego zastosowania. Rozszerzenie przeprowadzonych w pierwszym etapie symulacji mogło znacząco zredukować liczbę dalszych trudności.
+Przebieg realizacji pracy ujawnia znaczenie posiadania na etapie projektowym dobrze wybranych modeli obiektu, o~poziomie dokładności adekwatnym do przewidzianego zastosowania. Rozszerzenie przeprowadzonych w~pierwszym etapie symulacji mogło znacząco zredukować liczbę dalszych trudności.
 
-Zaprojektowane urządzenia z powodzeniem jest wykorzystywane przez autora na co dzień, demonstrując zaskakującą żywotność w warunkach eksploatacji na granicy możliwości.
+Zaprojektowane urządzenia z~powodzeniem jest wykorzystywane przez autora na co dzień, demonstrując zaskakującą żywotność w~warunkach eksploatacji na granicy możliwości.
 Skuteczność funkcjonowania udowadnia przykładowy wykres \ref{img:PrettyCharging} zapisanego przebiegu procesu.
 
 \bibliographystyle{plain} 
