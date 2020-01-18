@@ -37,25 +37,25 @@
 
 \chapter{Wprowadzenie}
 
-Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii dla urządzeń przenośnych oraz pojazdów elektrycznych i~hybrydowych. W związku z tym od 20 lat można obserwować intensywne badania mające na celu poprawę parametrów ogniw i testowanie nowych technologii. Spadająca cena i poprawa właściwości powoduje wzrost zapotrzebowania, zwłaszcza za sprawą popularyzacji samochodów osobowych z napędem elektrycznym (EV). Branża automotive stawia bardzo wysokie wymagania dla akumulatorów samochodów EV: wymagana jest duża gęstość energetyczna, wysoka szybkość ładowania i ponadprzeciętna trwałość. Wciąż badane są nowe strategie ładowania które pozwalały by zachować wysokie parametry przy minimalizacji czasu ładowania.
+Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii dla urządzeń przenośnych oraz pojazdów elektrycznych i~hybrydowych. W związku z tym od 20 lat można obserwować intensywne badania mające na celu poprawę parametrów ogniw i testowanie nowych technologii. Spadająca cena i poprawa właściwości powoduje wzrost zapotrzebowania, zwłaszcza za sprawą popularyzacji samochodów osobowych z napędem elektrycznym (EV). Branża automotive stawia bardzo wysokie wymagania dla akumulatorów samochodów EV: wymagana jest duża gęstość energetyczna, wysoka szybkość ładowania i ponadprzeciętna trwałość. Wciąż badane są nowe strategie ładowania które pozwalają zachować wysokie parametry przy minimalizacji czasu ładowania.
 
-Niniejszy projekt inżynierski wpisuje się w ten trend, proponując ładowarkę pozwalającą z dużą elastycznością kształtować przebieg procesu ładowania. Urządzenie to ma pozwalać na przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z uwagi na dominującą pozycję na rynku ogniw w standardzie 18650, taki rozmiar został wybrany za docelowy. Dodatkowo, ze względu na popularyzację przenośnych źródeł światła, wykorzystujących ten rozmiar, ładowarka ma służyć autorowi do codziennego użytku, także zakładając przyszły wzrost pojemności baterii.
+Niniejszy projekt inżynierski wpisuje się w ten trend, proponując ładowarkę pozwalającą z dużą elastycznością kształtować przebieg procesu ładowania. Urządzenie to ma umożliwiać przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z uwagi na dominującą pozycję na rynku ogniw w standardzie 18650, taki rozmiar został wybrany za docelowy. Dodatkowo, ze względu na popularyzację przenośnych źródeł światła, wykorzystujących ten rozmiar, ładowarka ma służyć autorowi do codziennego użytku, także zakładając przyszły wzrost pojemności baterii.
 
-W projekcie położony jest nacisk na stworzenie regulatora, pozwalającego realizować założone przebiegi napięcia i prądu na ogniwie. Istotna dla zachowania dobrej kondycji ogniwa jest stabilne utrzymywanie zadanych parametrów pracy. Zadanie nastawiania prądu jest zrealizowane za pomocą tranzystora MOSFET, pracującego w zakresie triodowym, którego otwieraniem steruje wzmacniacz operacyjny, tworząc źródło prądowe. Nad napięciem na ogniwie czuwa regulator PI, który w układzie kaskadowym tak steruje prądem, aby utrzymać je z wymaganą precyzją. Nad całością operacji kontrolę sprawuje skrypt w środowisku MATLAB, który odpowiada za wypracowywanie sygnału sterującego prądem oraz zbieranie i wyświetlanie danych z procesu.
+W projekcie położony jest nacisk na stworzenie regulatora, pozwalającego realizować założone przebiegi napięcia i prądu na ogniwie. Istotna dla zachowania dobrej kondycji ogniwa jest stabilne utrzymywanie zadanych parametrów pracy. Zadanie nastawiania prądu jest zrealizowane za pomocą tranzystora MOSFET, pracującego w zakresie triodowym, którego otwieraniem steruje wzmacniacz operacyjny, tworząc źródło prądowe. Nad napięciem na ogniwie czuwa regulator PI, który w układzie kaskadowym tak steruje prądem, aby utrzymać napięcie z wymaganą precyzją. Nad całością operacji kontrolę sprawuje skrypt w środowisku MATLAB, który odpowiada za wypracowywanie sygnału sterującego prądem oraz gromadzenie i wyświetlanie danych z procesu.
 
 
 \chapter{Teoria}
 \section{Budowa i specyfika działania ogniw litowo-jonowych}
-Historia użytecznych ogniw na bazie litu sięga lat 70, kiedy Adam Heller opatentował pierwszą kompozycję chemiczną anody, katody i elektrolitu \cite{heller1975electrochemical}, pozwalającą na skonstruowanie baterii w cenach akceptowalnych przez rynek. Od tego czasu dostępnych jest wiele technologii wykonania takich ogniw, różniących się ze względu na wykorzystane materiały. Ogólną zasadę działania ogniw przedstawia   rys. \ref{img:liion_structure}.
+Historia użytecznych ogniw na bazie litu sięga lat 70, kiedy Adam Heller opatentował pierwszą kompozycję chemiczną anody, katody i elektrolitu \cite{heller1975electrochemical}, pozwalającą na skonstruowanie baterii w cenach akceptowalnych przez rynek. Od tego czasu dostępnych jest wiele technologii wykonania takich ogniw, różniących się ze względu na wykorzystane materiały. Ogólną zasadę działania ogniw na przykładzie jednej z technologii przedstawia rys. \ref{img:liion_structure}.
 \begin{figure}[hbtp]
 \centering
      \resizebox{0.45\linewidth}{!}{\includegraphics[]{img/liion_structure.png}}
      \caption{Budowa i działanie ogniwa z anodą grafitową i katodą LCO. \cite{liionpic_wikimedia}  \label{img:liion_structure}}
 \end{figure}
-Na tle innych technologii akumulatory litowo-jonowe przodują zarówno pod wpływem wagowej gęstości energetycznej jak i wagowej gęstości mocy. Jest to spowodowane niską masą atomową litu i łatwością wnikania (interkalacji) dużej liczby (z natury małych) jonów w grafit, materiał prosty i tani w produkcji. Lit posiada jeden z najwyższych potencjałów standardowych półogniwa, co powoduje, że baterie z wykonane z jego użyciem będą miały wyższe napięcie niż przy użyciu sodu. Dodatkowo, w naturze pierwiastek ten występuje dość powszechnie, dlatego rozwój technologii nie jest zagrożony brakami surowcowymi. Głównymi wadami są jednak wysoka reaktywność litu, stawiająca wyzwania w kwestii zapewnienia bezpieczeństwa użytkowania oraz niska trwałość w warunkach powtarzającego się wykorzystywania pełnej pojemności. \cite{IBRAHIM20081221} Jest to powód, dla którego ogniwa te znalazły zastosowanie głównie w urządzeniach przenośnych i pojazdach oraz systemach awaryjnego zasilania, a w mniejszym stopniu do wyrównywania mocy dostarczanej do sieci elektrycznej.
+Na tle innych technologii akumulatory litowo-jonowe przodują zarówno pod wpływem wagowej gęstości energetycznej jak i wagowej gęstości mocy. Jest to spowodowane niską masą atomową litu i łatwością wnikania (interkalacji) dużej liczby (z natury małych) jonów w grafit, materiał prosty i tani w produkcji. Lit posiada jeden z najwyższych potencjałów standardowych półogniwa, co powoduje, że baterie z wykonane z jego użyciem będą miały wyższe napięcie niż przy użyciu innych metali. Dodatkowo, w naturze pierwiastek ten występuje dość powszechnie, dlatego rozwój technologii nie jest zagrożony brakami surowcowymi. Głównymi wadami są jednak wysoka reaktywność litu, stawiająca wyzwania w kwestii zapewnienia bezpieczeństwa użytkowania oraz niska trwałość w warunkach powtarzającego się wykorzystywania pełnej pojemności\cite{IBRAHIM20081221}. Ograniczona trwałość i wciąż znaczna cena jest powodem, dla którego ogniwa te znalazły zastosowanie głównie w urządzeniach przenośnych i pojazdach oraz systemach awaryjnego zasilania, a w mniejszym stopniu do wyrównywania mocy dostarczanej do sieci elektrycznej.
 
 \section{Porównanie chemii}
-Obecnie dominującą rolę przejęły ogniwa oparte o katodę niklowo-manganowo-kobaltową NMC (w różnych proporcjach składników, dąży się do wyeliminowania lub zmniejszenia udziału drogiego kobaltu) oraz niklowo-kobaltowo-aluminiową NCA.\cite{bu_liiontypes} W zastosowaniach wymagających dużego bezpieczeństwa i długiej żywotności używa się także katod z fosforanu litowo-żelazowego LFP lub anod z tytanku litu LTO. Pozostałe technologie wychodzą z użytku, są bardzo drogie lub na razie mają wąski zakres zastosowań. W tabeli \ref{tab:chemisties_voltages} zebrano parametry interesujące ze względu na konstrukcję ładowarki.
+Obecnie dominującą rolę przejęły ogniwa oparte o katodę niklowo-manganowo-kobaltową NMC (w różnych proporcjach składników, dąży się do wyeliminowania lub zmniejszenia udziału drogiego kobaltu) oraz niklowo-kobaltowo-aluminiową NCA\cite{bu_liiontypes}. W zastosowaniach wymagających dużego bezpieczeństwa i długiej żywotności używa się także katod z fosforanu litowo-żelazowego LFP lub anod z tytanku litu LTO. Pozostałe technologie wychodzą z użytku, są bardzo drogie lub na razie mają wąski zakres zastosowań. W tabeli \ref{tab:chemisties_voltages} zebrano parametry interesujące ze względu na konstrukcję ładowarki.
 \begin{table}[hbtp]
 \caption{Wybrane parametry zależne od technologii ogniwa.\cite{bu_liiontypes} \label{tab:chemisties_voltages}}
 \centerline{\begin{tabular}{|c|c|c|c|c|}
@@ -94,29 +94,31 @@ Powstało wiele dokładnych modeli\cite{1634598_BATT_MODELS} ogniw litowo-jonowy
      \caption{Model elektryczny ogniwa.\label{img:thevenin_model}}
 \end{figure}
 
-Transmitancja operatorowa tego modelu wynosi:
-\begin{equation}
-    K(s) = \frac{U(s)}{I(s)} = (R_s + R_p)\frac{\frac{R_s R_p C_p s +1}{R_s + R_p}s+1}{R_p C_p s +1} + Vcell
-\end{equation}
+Na potrzeby strojenia regulatora opracowano drugi model uwzględniający całą dynamikę toru sterowania. W celu jego uzyskania, na obiekt podano wymuszenie skokowe o wartości losowej z całego użytecznego przedziału prądów. Na podstawie zapisanych odpowiedzi, z użyciem System Identification Toolbox MATLABa, znaleziono parametry modelu 2. rzędu w postaci transmitancji dyskretnej, najlepiej opisującego zachowanie układu. W ten sposób uwzględniono wszystkie ważne właściwości obiektu. W ten sposób uniezależniono się od błędu związanego z wyborem modelu obiektu bez weryfikacji jego adekwatności.
 
 \section{Regulator}
-Aby realizować wybraną strategię, konieczne jest użycie struktury regulatora zapewniającej stabilne działanie nawet przy pewnej zmienności parametrów obiektu, wynikającej z różnic technologicznych pomiędzy ogniwami. Wymagania te spełnia, przy jednoczesnym zachowaniu łatwości implementacji, regulator PI.
+Aby realizować wybraną strategię, konieczne jest użycie struktury regulatora zapewniającej stabilne działanie nawet przy pewnej zmienności parametrów obiektu, wynikającej z różnic technologicznych pomiędzy ogniwami. Wymagania te może spełnić, przy jednoczesnym zachowaniu łatwości implementacji, regulator PI.
 \begin{equation}
      u(t)=k_{p}\left[e(t)+{\frac {1}{T_{i}}}\int _{0}^{t}e(\tau )d\tau \right]
      \label{eq:PI_timebased}
 \end{equation}
-
-Wykorzystano możliwość analizy regulatora jako układu ciągłego po uwzględnieniu próbkowania jako opóźnienia w obiekcie. Okres próbkowania $h=0.25$~s jest 120 razy mniejszy od najmniejszej stałej czasowej. Do doboru nastaw użyto modelu \ref{eq:model_z_opozn} i narzędzi MATLABa aby uzyskać zapas fazy > 60\degree i zapas amplitudy > 8 dB. 
-\begin{equation}
-    K(s)= (R_s + R_p)\frac{\frac{R_s R_p C_p s +1}{R_s + R_p}s+1}{R_p C_p s +1}*e^{-\frac{h}{2}s}
-    \label{eq:model_z_opozn}
-\end{equation}
-Zadana wartość napięcia jest utrzymywana przez regulator, podczas gdy ograniczenie prądowe ładowania jest realizowane przez ograniczenie wartości wyjściowej. Aby uniknąć zjawiska wind-up, błąd podawany na część całkową jest zerowany przy oparciu się o ograniczenie.
-
+W celu znalezienia nastaw, utworzono model ciągły obiektu za pomocą podstawienia Tustina. Znalezione numerycznie nastawy $K_p$ i $T_i$ minimalizują czas dojścia do stanu ustalonego przy jednoczesnym spełnieniu warunków:
+\begin{itemize}
+    \item przeregulowanie względne < 0.1\%,
+    \item zapas fazy > 60\degree,
+    \item zapas amplitudy > 10 dB,
+    \item stała czasowa części całkującej $T_i$ > okresu próbkowania $h$.
+\end{itemize}
+ Po przejściu na model cyfrowy regulatora podstawieniem Tustina uzyskano postać \ref{eq:piz} nadającą się do implementacji z uwzględnieniem dodatkowego opóźnienia zadawania sygnału od pobrania próbki.
+ \begin{equation}
+Kr(z) = \frac{B_1+B_2 z^{-1}}{1 - z^{-1}}, \qquad
+B_1 = K_p\left(1+\frac{h}{2T_i}\right), \quad B_2 = K_p\left(\frac{h}{2T_i}-1\right)
+\label{eq:piz}
+ \end{equation}
 
 \chapter{Projekt urządzenia}
 \section{Założenia}
-Urządzenie ma być zdolne do ładowania ogniw litowo-jonowych o różnym składzie anody i katody w standardzie wymiarowym 18650 z ciągłym prądem maksymalnym 3~A. Prąd ładowania ma być regulowany z rozdzielczością powyżej 20~mA, a napięcie utrzymywane z dokładnością do 20~mV. Urządzenie jest zasilane z zasilacza impulsowego o napięciu 5~V i odpowiedniej mocy.
+Urządzenie ma być zdolne do ładowania ogniw litowo-jonowych o różnym składzie anody i katody w standardzie wymiarowym 18650 z ciągłym prądem maksymalnym 3~A. Prąd ładowania ma być regulowany z rozdzielczością piniżej 20~mA, a napięcie utrzymywane z dokładnością do 20~mV. Urządzenie jest zasilane z zasilacza impulsowego o napięciu 5~V i odpowiedniej mocy.
 \section{Identyfikacja kluczowych obszarów projektu}
 Aby można było realizować płynną regulację prądu wyjściowego można zastosować regulator liniowy lub przetwornice impulsowa o regulowanym napięciu wyjściowym. Ze względu na fakt, że urządzenie ma nadawać się do badań wpływu procesu ładowania na parametry ogniw, zdecydowano się na regulator liniowy, aby nie trzeba było badać stabilności napięcia ładowania i poziomu niepożądanych szumów, mogących wpłynąć na jakość wyników prób. Wybrany sposób ograniczenia prądu ma taką zaletę, że tłumi zakłócenia pochodzące z zasilania.
 
@@ -129,7 +131,7 @@ Kontroler układu musi odpowiadać także za kwestie bezpieczeństwa --- minimal
 \section{Proponowane rozwiązania i wybór komponentów}
 Ze względu na wysoki założony prąd ładowania i niewielką różnicę napięcia pomiędzy maksymalnym napięciem na ogniwie (4.2~V) a napięciem zasilania (5~V) nie znaleziono żadnych gotowych rozwiązań zintegrowanych pozwalających na dostatecznie precyzyjną kontrolę prądu. W związku z tym wybrano rozwiązanie oparte o tranzystor MOSFET z kanałem typu P, sterowny przez wzmacniacz operacyjny w pętli sprzężenia zwrotnego.
 
-Podczas działania układu, w momencie gdy ogniwo jest rozładowane, a napięcie na nim wynosi 3~V, dla prądu maksymalnego moc wydzielana na tranzystorze wynosi 5.3~W. Jest to stosunkowo dużo, zważywszy na małe rozmiary użytego tranzystora. W tym celu użyto laminatu o ponadstandardowej grubości miedzi i pasywnych radiatorów wlutowanych bezpośrednio wokół tranzystora.
+Podczas działania układu, w momencie gdy ogniwo jest rozładowane, a napięcie na nim wynosi 3~V, dla prądu maksymalnego moc wydzielana na tranzystorze wynosi 5.3~W. Jest to stosunkowo dużo, zważywszy na małe rozmiary użytego tranzystora. W tym celu zaproponowano użycie laminatu o ponadstandardowej grubości miedzi i pasywnych radiatorów wlutowanych bezpośrednio wokół tranzystora.
 
 Do sterowania całym układem wybrano 8-bitowy mikrokontroler firmy Microchip: ATtiny414. Zawiera on wszystkie potrzebne peryferia od razu zintegrowane w jednym układzie, przy jednoczesnym zachowaniu niskiej ceny. 
 \section{Projekt struktury}
@@ -286,6 +288,13 @@ Testy wykonane na docelowych ogniwach przebiegły pomyślnie. Ze względu na du�
 Ostatecznie projekt wykonany jest na bazie płytki PCB z oryginalnego projektu z modyfikacjami z punktu \ref{section:przerobki}. Sprawdzono z pozytywnym wynikiem stabilność funkcjonowania dla prądu 2~A i napięcia początkowego ogniwa 2.5~V, co przekłada się na około 3.7~W mocy wydzielanej na tranzystorze. Na testy większych obciążeń nie pozwalają posiadane ogniwa.
 
 \section{Implementacja potrzebnych funkcjonalności}
+Regulator dyskretny \ref{eq:piz} jest w formie nadającej się do implementacji.
+\begin{verbatim}
+    u(i) = u(i-1) + B1*e(i-1) + B2*e(i-2);
+\end{verbatim}
+Implementacja uwzględnia opóźnienie wystawienia sterowania od pobrania próbki o cały okres.
+Problem windupu jest rozwiązany przez nałożenie ograniczeń wartości wyjściowej.
+
 Ze względu na fakt, że przeznaczeniem urządzenia są zadania eksperymentalne, które zawsze zakładają zbieranie danych na komputerze, zdecydowano o implementacji całej funkcjonalności za pomocą skryptów w środowisku MATLAB. Pozwala to także na bieżącą obserwację parametrów procesu.
 
 Zaimplementowane funkcjonalności pozwalają na ciągłe monitorowanie napięcia na ogniwie oraz realizacje protokołu ładowania CC-CV do zadanych wartości napięcia oraz prądu maksymalnego i granicznego końcowego.
@@ -293,7 +302,7 @@ Zaimplementowane funkcjonalności pozwalają na ciągłe monitorowanie napięcia
 Skrypt ładujący CC-CV działa następująco:
 \begin{enumerate}
     \item Sprawdzane są napięcia na stykach uchwytu. Jeżeli nie mieszczą się w założonym przedziale, ładowanie jest wyłączane i użytkownik jest informowany o błędzie.
-    \item Regulator utrzymuje zadane parametry ładowaia.
+    \item Regulator utrzymuje zadane parametry ładowania.
     \item Po osiągnięciu wartości prądu poniżej progu końcowego lub wystąpieniu błędu, ładowanie jest wyłączane, a użytkownik powiadamiany o rezultacie.
 \end{enumerate}
 
@@ -323,35 +332,26 @@ Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano konden
 \end{figure}
 \begin{figure}[hbtp]
      \resizebox{\linewidth}{!}{\includegraphics[]{img/bode_withcap.png}}
-     \caption{Badanie zapasu fazy dla po dodaniu kompensatora. \label{img:MrBodeWithCap}}
+     \caption{Badanie zapasu fazy po dodaniu kompensatora. \label{img:MrBodeWithCap}}
 \end{figure}
 
-Po zastosowanych zmianach:
+Dodatkowo, na zmniejszenie szumów wpłynęło nastrojenie regulatora.
+Reprezentatywny zapis przebiegu procesu po zastosowanych zmianach przedstawiono na \ref{img:PrettyCharging}.
 \begin{figure}[hbtp]
     % \input{plots/charging.tex}
-     \caption{Przebieg procesu ładowania. Widoczne uszkodzenie ogniwa. \label{img:PrettyChargeWithCellFailure}}
+     \caption{Przebieg procesu ładowania. \label{img:PrettyCharging}}
 \end{figure}
-Podczas uruchomienia zaobserwowano uszkodzenie ogniwa, skutkujące wzrostem prądu, który w tej fazie powinien tylko spadać.Ponieważ rezystancja wewnętrzna ogniwa ulega w procesie ciągłym zmianom, co więcej, szybkość tych zmian także nie jest stała, stąd jakość regulacji może być zdecydowanie polepszona użyciem takich technik jak np. gain scheduling.
-Mimo, że układ jest statyczny względem zadanego prądu, odpowiednio duże wzmocnienie regulatora PI zapewnia akceptowalne mały uchyb w całym czasie regulacji. 
 
-***
-%   From input "u1" to output "y1":
-%   0.00367 + 0.09044 z^-1 - 0.09406 z^-2
-%   -------------------------------------
-%       1 - 1.304 z^-1 + 0.3044 z^-2
- 
-% Name: tf2
-% Sample time: 0.1005 seconds
-***
 
 \chapter{Uwagi końcowe}
-Cele postawione w projekcie zostały z sukcesem zrealizowane. Urządzenie jest w stanie regulować prąd i napięcie ładowania, realizując założone strategie ładowania z przewidzianą dokładnością. Proces realizacji urządzenia ujawnił wiele błędów etapu projektowego, które jednak udało się naprawić bez wpływu na skuteczność działania ładowarki. Wykorzystanie wstępnie uruchomionego urządzenia pozwoliło na zebranie danych potrzebnych do określenia modelu, pozwalającego na dalsza poprawę działania. Skuteczność funkcjonowania udowadnia stosowny wykres zapisanego przebiegu procesu.
+Cele postawione w projekcie zostały z sukcesem zrealizowane. Urządzenie jest w stanie regulować prąd i napięcie ładowania, realizując założone strategie ładowania z przewidzianą dokładnością. Proces realizacji urządzenia ujawnił wiele błędów etapu projektowego, które jednak udało się naprawić bez wpływu na skuteczność działania ładowarki. Wykorzystanie wstępnie uruchomionego urządzenia pozwoliło na zebranie danych potrzebnych do określenia modelu, pozwalającego na dalsza poprawę działania. 
 
-Przebieg realizacji pracy ujawnia znaczenie posiadania na etapie projektowym dobrze wybranych modeli obiektu, o~poziomie dokładności adekwatnym do przewidzianego zastosowania. Rozszerzenie przeprowadzonych w pierwszym etapie symulacji mogło znacząco zredukować liczbę dalszych trudności
+Eksperymentalna identyfikacja modelu o odpowiednio dużym stopniu uproszczenia, stanowiła spore wyzwanie. Przełomem było potraktowanie wolno zmiennej składowej odpowiedzi, wynikającej z nieśpiesznego wzrostu napięcia na ogniwie w trakcie ładowanie, jako zakłócenia.
+
+Przebieg realizacji pracy ujawnia znaczenie posiadania na etapie projektowym dobrze wybranych modeli obiektu, o~poziomie dokładności adekwatnym do przewidzianego zastosowania. Rozszerzenie przeprowadzonych w pierwszym etapie symulacji mogło znacząco zredukować liczbę dalszych trudności.
 
 Zaprojektowane urządzenia z powodzeniem jest wykorzystywane przez autora na co dzień, demonstrując zaskakującą żywotność w warunkach eksploatacji na granicy możliwości.
-
-\remark{to wypadało by jeszcze trochę rozszerzyć}
+Skuteczność funkcjonowania udowadnia przykładowy wykres \ref{img:PrettyCharging} zapisanego przebiegu procesu.
 
 \bibliographystyle{plain} 
 \bibliography{bibiking}
