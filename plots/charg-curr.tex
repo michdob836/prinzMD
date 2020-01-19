@@ -4,7 +4,7 @@
                 grid style={dotted,gray},
                 width=\textwidth,
                 height=0.35\textheight,
-                ylabel={$V_c$ [V]},
+                ylabel={$I$ [A]},
                 xlabel={czas, [min]},
                 legend cell align=left,
                 legend pos = north west,
@@ -17,6 +17,7 @@
                 mark=none,
                 mark size=5,
                 red!60!black,
-		 	] 	table [x=time, y=Vcell] {data/typ_charg.tsv};
+		 	] 	table [x=time, y=Icell] {data/typ_charg.tsv};
+
 \end{axis}
 \end{tikzpicture}

@@ -10,10 +10,11 @@
 \usepackage{pstricks}
 \usepackage{hyperref}
 \usepackage{pgfplots}
+\pgfplotsset{compat=1.14}
 
 \usepackage{color}
 \definecolor{GREEN}{rgb}{0,0.5,0}
-\newcommand{\remark}[1]{{[\color{GREEN}\emph{\footnotesize #1}{}]}}
+
 
 
 %% thesis author
@@ -41,7 +42,7 @@ Współcześnie ogniwa litowo-jonowe zdominowały rynek przechowywania energii d
 
 Niniejszy projekt inżynierski wpisuje się w~ten trend, proponując ładowarkę pozwalającą z~dużą elastycznością kształtować przebieg procesu ładowania. Urządzenie to ma umożliwiać przeprowadzenie ograniczonych badań wpływu sposobu ładowania na parametry ogniwa. Z~uwagi na dominującą pozycję na rynku ogniw w~standardzie 18650, taki rozmiar został wybrany za docelowy. Dodatkowo, ze względu na popularyzację przenośnych źródeł światła, wykorzystujących ten rozmiar, ładowarka ma służyć autorowi do codziennego użytku, także zakładając przyszły wzrost pojemności baterii.
 
-W~projekcie położony jest nacisk na stworzenie regulatora, pozwalającego realizować założone przebiegi napięcia i~prądu na ogniwie. Istotna dla zachowania dobrej kondycji ogniwa jest stabilne utrzymywanie zadanych parametrów pracy. Zadanie nastawiania prądu jest zrealizowane za pomocą tranzystora MOSFET, pracującego w~zakresie triodowym, którego otwieraniem steruje wzmacniacz operacyjny, tworząc źródło prądowe. Nad napięciem na ogniwie czuwa regulator PI, który w~układzie kaskadowym tak steruje prądem, aby utrzymać napięcie z~wymaganą precyzją. Nad całością operacji kontrolę sprawuje skrypt w~środowisku MATLAB, który odpowiada za wypracowywanie sygnału sterującego prądem oraz gromadzenie i~wyświetlanie danych z~procesu.
+W~projekcie położony jest nacisk na stworzenie regulatora, pozwalającego realizować założone przebiegi napięcia i~prądu na ogniwie. Istotna dla zachowania dobrej kondycji ogniwa jest stabilne utrzymywanie zadanych parametrów pracy. Zadanie nastawiania prądu jest zrealizowane za pomocą tranzystora MOSFET, pracującego w~zakresie triodowym, którego otwieraniem steruje wzmacniacz operacyjny, tworząc źródło prądowe. Nad napięciem na ogniwie czuwa regulator PI, który w~układzie kaskadowym tak steruje prądem, aby utrzymać napięcie z~wymaganą precyzją. Nad całością operacji kontrolę sprawuje skrypt w~środowisku MATLAB, wyświetlający dane z~procesu.
 
 
 \chapter{Teoria}
@@ -62,14 +63,14 @@ Obecnie dominującą rolę przejęły ogniwa oparte o~katodę niklowo-manganowo-
 \hline
 Technologia & Napięcie maks., V~& Napięcie min., V~& Szybkość ład., C~& Żywotność, cykle \\
 \hline
-LCO & 4.2 & 2.5 & 0.7-{}-1 & 500-{}-1000\\
+LCO & 4.2 & 2.5 & 0.7--1 & 500--1000\\
 \hline
-LMO & 4.2 & 2.5 & 0.7-{}-1 & 300-{}-700\\
+LMO & 4.2 & 2.5 & 0.7--1 & 300--700\\
 \hline 
-NMC & 4.2 & 2.5 & 0.7-{}-1 & 1000-{}-2000\\ \hline
+NMC & 4.2 & 2.5 & 0.7--1 & 1000--2000\\ \hline
 LFP & 3.65 & 2.5 & 1~& 2000+\\ \hline
 NCA & 4.2 & 3.0 & 0.7 & 500\\ \hline
-LTO & 2.85 & 1.8 & 1~& 3000-{}-7000\\ \hline
+LTO & 2.85 & 1.8 & 1~& 3000--7000\\ \hline
 \end{tabular}}
 \end{table}
 
@@ -111,7 +112,7 @@ W~celu znalezienia nastaw, utworzono model ciągły obiektu za pomocą podstawie
 \end{itemize}
  Po przejściu na model cyfrowy regulatora podstawieniem Tustina uzyskano postać \ref{eq:piz} nadającą się do implementacji z~uwzględnieniem dodatkowego opóźnienia zadawania sygnału od pobrania próbki.
  \begin{equation}
-Kr(z) = \frac{B_1+B_2 z^{-1}}{1 - z^{-1}}, \qquad
+K_r(z) = \frac{B_1+B_2 z^{-1}}{1 - z^{-1}}, \qquad
 B_1 = K_p\left(1+\frac{h}{2T_i}\right), \quad B_2 = K_p\left(\frac{h}{2T_i}-1\right)
 \label{eq:piz}
  \end{equation}
@@ -124,7 +125,7 @@ Aby można było realizować płynną regulację prądu wyjściowego można zast
 
 Wadą tego rozwiązania jest spora strata energii, a~w konsekwencji znaczące wydzielanie się ciepła w~układzie. Dla układu tworzonego w~celach badawczych takie marnotrawstwo energii jest bez znaczenia, jednak temperatura komponentów ma duży wpływ na ich żywotność, a~co za tym idzie powtarzalność procesu. Stąd istotne dla stabilnego działania układu jest zapewnienie skutecznego chłodzenia.
 
-Aby można było śledzić postęp ładowania i~w prosty sposób zadawać parametry, przydatna jest komunikacja z~komputerem. Wymagania co do kanału komunikacyjnego nie są wygórowane --- ilość danych do przekazania jest niewielka, a~okres przesyłania jest rzędu 1~s.
+Aby można było śledzić postęp ładowania i~w prosty sposób zadawać parametry, przydatna jest komunikacja z~komputerem. Wymagania co do kanału komunikacyjnego nie są wygórowane --- ilość danych do przekazania jest niewielka, a~okres próbkowania napięcia i~aktualizacji wartości przez konwerter D/A wynosi 0.1--0.2 s.
 
 Kontroler układu musi odpowiadać także za kwestie bezpieczeństwa --- minimalna funkcjonalność to ograniczenie lub odcięcie prądu w~przypadku wzrostu temperatury ogniwa ponad ustaloną wartość.
 
@@ -232,7 +233,7 @@ Istotny fragment projektu został zamodelowany w~programie LTSpice jak na rys. \
 \end{figure}
 Model ogniwa został przyjęty za \cite{8759769_cellmodel1storder}. W~praktyce dla symulacji znaczenie ma tylko rezystancja szeregowa równa 120m$\Omega$ i~napięcie na ogniwie.
 
-Symulacja typu transient dla prądów 230 i~2730 mA przy napięciach na ogniwie 2.5, 4~i 4.2 V~wykazała poprawne zachowanie układu, napięcia bez oscylacji osiągały zadane wartości.\remark{dobrze by umieścić te wyniki w~pracy. Te charakterystyki Nyquista lub/i Bodego też.}
+Symulacja typu transient dla prądów 230 i~2730 mA przy napięciach na ogniwie 2.5, 4~i 4.2 V~wykazała poprawne zachowanie układu, napięcia bez oscylacji osiągały zadane wartości.
 
 \chapter{Realizacja prototypu}
 \section{Kolejność działania i~bieżąca modyfikacja projektu\label{section:przerobki}}
@@ -266,7 +267,7 @@ Podczas weryfikacji działania przetworników stwierdzono, że układ C/A dział
 
 Podczas weryfikacji poprawności działania wzmacniaczy stwierdzono, że przyczyną ich zapłonu jest błędne podłączenie zasilania i~masy. Na obydwu footprintach wyłącznie te piny były zamienione. Przecięcie 2~ścieżek i~dodanie 3~rezystorów 0~$\Omega$ pozwoliło w~stosunkowo czysty sposób naprawić pomyłkę, bez wpływu na jakość działania układu.
 
-Po zamontowaniu tranzystora stwierdzono, że w~skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w~większości zastosowań), a~co za tym idzie, dren ze źródłem był zamieniony. Po wykryciu, że powodem przepływu prądu oraz pewnego spadku napięcia jest wewnętrzna dioda, a~następnie odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i~przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Ze względu na brak możliwości realizacji radiatora zgodnie z~projektem, wykorzystano radiator z~blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o~deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degreeC/W}$ przy naturalnej konwekcji. 
+Po zamontowaniu tranzystora stwierdzono, że w~skutek pomyłki przy rysowaniu schematu, symbol tranzystora był odwrócony (w tym układzie jest użyty odwrotnie niż w~większości zastosowań), a~co za tym idzie, dren ze źródłem był zamieniony. Po wykryciu, że powodem przepływu prądu oraz pewnego spadku napięcia jest wewnętrzna dioda, a~następnie odwróceniu elementu układa działa poprawnie. Konieczna była rekonfiguracja obszaru odprowadzania ciepła i~przeniesienie rezystora spod wzmacniacza, aby doprowadzał sygnał do ścieżki bramki. Ze względu na brak możliwości realizacji radiatora zgodnie z~projektem, wykorzystano radiator z~blachy miedzianej 0.6mm przeznaczony dla obudów D2Pak o~deklarowanym oporze cieplnym do otoczenia równym $\mathrm{11\degree C/W}$ przy naturalnej konwekcji. 
 
 Ponieważ podanie zbyt dużego napięcia na ogniwo lub zwarcie biegunów może prowadzić do zniszczenia ogniwa a~nawet zapalenia się, aby bezpiecznie sprawdzić działanie układu wykonano obciążenie testowe z~diód o~odpowiedniej mocy, którego schemat przedstawiono na rys. \ref{img:testload}. Urządzenie to pozwala także na bezpieczne rozładowanie ogniw do około 2.5~V.
 \begin{figure}[hbtp]
@@ -295,7 +296,7 @@ Regulator dyskretny \ref{eq:piz} jest w~formie nadającej się do implementacji.
     u(i) = u(i-1) + B1*e(i-1) + B2*e(i-2);
 \end{verbatim}
 Implementacja uwzględnia opóźnienie wystawienia sterowania od pobrania próbki o~cały okres.
-Problem windupu jest rozwiązany przez nałożenie ograniczeń wartości wyjściowej.
+Problem windup-u jest rozwiązany przez nałożenie ograniczeń wartości wyjściowej.
 
 Ze względu na fakt, że przeznaczeniem urządzenia są zadania eksperymentalne, które zawsze zakładają zbieranie danych na komputerze, zdecydowano o~implementacji całej funkcjonalności za pomocą skryptów w~środowisku MATLAB. Pozwala to także na bieżącą obserwację parametrów procesu.
 
@@ -338,10 +339,14 @@ Celem zwiększenia zapasu fazy poprzez do akceptowalnych wartości dodano konden
 \end{figure}
 
 Dodatkowo, na zmniejszenie szumów wpłynęło nastrojenie regulatora.
-Reprezentatywny zapis przebiegu procesu po zastosowanych zmianach przedstawiono na \ref{img:PrettyCharging}.
+Reprezentatywny zapis przebiegu procesu po zastosowanych zmianach przedstawiono na rys. \ref{img:PrettyCharging} i \ref{img:PrettyCharging_I}.
 \begin{figure}[hbtp]
-    % \input{plots/charging.tex}
-     \caption{Przebieg procesu ładowania. \label{img:PrettyCharging}}
+     \input{plots/charging.tex}
+     \caption{Przebieg procesu ładowania: napięcie na ogniwie. \label{img:PrettyCharging}}
+\end{figure}
+\begin{figure}[hbtp]
+     \input{plots/charg-curr.tex}
+     \caption{Przebieg procesu ładowania: prąd ładowania. \label{img:PrettyCharging_I}}
 \end{figure}
 
 
